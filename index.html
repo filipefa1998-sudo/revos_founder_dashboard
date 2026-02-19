@@ -8,1597 +8,1039 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #080c10;
-    --surface: #0d1117;
-    --surface2: #111820;
-    --border: #1e2d3d;
-    --green: #00ff88;
-    --yellow: #ffcc00;
-    --red: #ff3b5c;
-    --blue: #00aaff;
-    --text: #e2e8f0;
-    --muted: #5a7085;
-    --font-mono: 'Space Mono', monospace;
-    --font-display: 'Syne', sans-serif;
+    --bg: #080c10; --surface: #0d1117; --surface2: #111820; --border: #1e2d3d;
+    --green: #00ff88; --yellow: #ffcc00; --red: #ff3b5c; --blue: #00aaff; --purple: #a855f7;
+    --text: #e2e8f0; --muted: #5a7085;
+    --font-mono: 'Space Mono', monospace; --font-display: 'Syne', sans-serif;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-display); background: var(--bg); color: var(--text); min-height: 100vh; }
+  body::before { content:''; position:fixed; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,136,.012) 2px,rgba(0,255,136,.012) 4px); pointer-events:none; z-index:1000; }
 
-  body {
-    font-family: var(--font-display);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 0;
-  }
+  /* HEADER */
+  .header { border-bottom:1px solid var(--border); padding:14px 28px; display:flex; align-items:center; justify-content:space-between; background:var(--surface); position:sticky; top:0; z-index:100; }
+  .logo { font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--green); letter-spacing:4px; }
+  .logo span { color:var(--muted); }
+  .hdr-right { display:flex; align-items:center; gap:10px; }
+  .live-badge { font-family:var(--font-mono); font-size:9px; color:var(--muted); border:1px solid var(--border); padding:4px 10px; border-radius:4px; display:flex; align-items:center; gap:5px; }
+  .live-dot { width:6px; height:6px; background:var(--green); border-radius:50%; animation:pulse 2s infinite; }
+  .meeting-btn { font-family:var(--font-mono); font-size:10px; letter-spacing:2px; background:rgba(168,85,247,.12); border:1px solid rgba(168,85,247,.4); color:var(--purple); padding:6px 14px; border-radius:4px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+  .meeting-btn:hover { background:rgba(168,85,247,.22); }
+  @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,136,.4)} 50%{opacity:.6;box-shadow:0 0 0 5px rgba(0,255,136,0)} }
 
-  /* Scanline overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,136,0.015) 2px, rgba(0,255,136,0.015) 4px);
-    pointer-events: none;
-    z-index: 1000;
-  }
-
-  .header {
-    border-bottom: 1px solid var(--border);
-    padding: 20px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--surface);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .logo {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--green);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-  }
-
-  .logo span { color: var(--muted); }
-
-  .week-badge {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    padding: 4px 12px;
-    border-radius: 4px;
-  }
-
-  .live-dot {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    background: var(--green);
-    border-radius: 50%;
-    margin-right: 8px;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
-    50% { opacity: 0.6; box-shadow: 0 0 0 6px rgba(0,255,136,0); }
-  }
-
-  .main {
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 0;
-    min-height: calc(100vh - 65px);
-  }
-
-  .left-panel {
-    padding: 28px 32px;
-    border-right: 1px solid var(--border);
-    overflow-y: auto;
-  }
-
-  .right-panel {
-    padding: 28px 24px;
-    overflow-y: auto;
-    background: var(--surface);
-  }
+  /* LAYOUT */
+  .main { display:grid; grid-template-columns:1fr 300px; min-height:calc(100vh - 53px); }
+  .left { padding:22px 26px; border-right:1px solid var(--border); overflow-y:auto; }
+  .right { padding:18px; background:var(--surface); overflow-y:auto; }
 
   /* TABS */
-  .tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 28px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .tab {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 10px 20px;
-    cursor: pointer;
-    color: var(--muted);
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    background: none;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-  }
-
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--green); border-bottom-color: var(--green); }
-
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  /* SECTION HEADERS */
-  .section-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* COMPANY HEALTH GRID */
-  .health-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 32px;
-  }
-
-  .health-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-
-  .health-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--status-color, var(--muted));
-    transition: background 0.3s;
-  }
-
-  .health-card.green { --status-color: var(--green); border-color: rgba(0,255,136,0.15); }
-  .health-card.yellow { --status-color: var(--yellow); border-color: rgba(255,204,0,0.15); }
-  .health-card.red { --status-color: var(--red); border-color: rgba(255,59,92,0.15); }
-
-  .health-metric-name {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    font-family: var(--font-mono);
-  }
-
-  .health-value {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--text);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .health-target {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--muted);
-  }
-
-  .status-badge {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 1px;
-    padding: 3px 8px;
-    border-radius: 3px;
-    font-weight: 700;
-  }
-
-  .status-badge.green { background: rgba(0,255,136,0.1); color: var(--green); }
-  .status-badge.yellow { background: rgba(255,204,0,0.1); color: var(--yellow); }
-  .status-badge.red { background: rgba(255,59,92,0.1); color: var(--red); }
-
-  /* FOUNDER SCORECARDS */
-  .founder-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 32px;
-  }
-
-  .founder-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-    transition: border-color 0.2s;
-  }
-
-  .founder-card:hover { border-color: rgba(0,255,136,0.3); }
-
-  .founder-name {
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-
-  .founder-role {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--green);
-    letter-spacing: 2px;
-    margin-bottom: 16px;
-  }
-
-  .metric-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 12px;
-  }
-
-  .metric-row:last-child { border-bottom: none; }
-  .metric-row .label { color: var(--muted); }
-  .metric-row .val { font-family: var(--font-mono); font-weight: 700; }
-  .metric-row .val.green { color: var(--green); }
-  .metric-row .val.yellow { color: var(--yellow); }
-  .metric-row .val.red { color: var(--red); }
-
-  /* WEEKLY TREND CHART */
-  .trend-chart {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 32px;
-  }
-
-  .chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-
-  .chart-title {
-    font-weight: 700;
-    font-size: 14px;
-  }
-
-  .chart-legend {
-    display: flex;
-    gap: 16px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-  }
-
-  .legend-item { display: flex; align-items: center; gap: 6px; color: var(--muted); }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
-
-  .chart-area {
-    position: relative;
-    height: 120px;
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-  }
-
-  .bar-group {
-    flex: 1;
-    display: flex;
-    gap: 3px;
-    align-items: flex-end;
-    flex-direction: row;
-  }
-
-  .bar {
-    flex: 1;
-    border-radius: 3px 3px 0 0;
-    transition: height 0.5s ease;
-    cursor: pointer;
-    position: relative;
-  }
-
-  .bar:hover::after {
-    content: attr(data-val);
-    position: absolute;
-    top: -22px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: var(--font-mono);
-    font-size: 9px;
-    color: var(--text);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 2px 6px;
-    border-radius: 3px;
-    white-space: nowrap;
-  }
-
-  .bar.filipe { background: var(--green); }
-  .bar.loa { background: var(--blue); }
-  .bar.clinton { background: var(--yellow); }
-
-  .chart-weeks {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-  }
-
-  .week-label {
-    flex: 1;
-    text-align: center;
-    font-family: var(--font-mono);
-    font-size: 9px;
-    color: var(--muted);
-  }
-
-  /* DESIGN PARTNER TRACKER */
-  .partner-tracker {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 32px;
-  }
-
-  .partner-progress {
-    display: flex;
-    gap: 8px;
-    margin: 16px 0;
-  }
-
-  .partner-slot {
-    flex: 1;
-    height: 40px;
-    border-radius: 6px;
-    border: 1px dashed var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--muted);
-    transition: all 0.3s;
-    cursor: pointer;
-  }
-
-  .partner-slot.filled {
-    background: rgba(0,255,136,0.1);
-    border: 1px solid var(--green);
-    color: var(--green);
-    font-weight: 700;
-  }
-
-  .partner-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 16px;
-  }
-
-  .partner-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 13px;
-  }
-
-  .partner-status {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .partner-name { flex: 1; font-weight: 600; }
-  .partner-stage { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
-
-  /* ALERTS */
-  .alerts-panel {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 28px;
-  }
-
-  .alert-item {
-    display: flex;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    align-items: flex-start;
-    animation: slideIn 0.3s ease;
-  }
-
-  .alert-item:last-child { border-bottom: none; }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .alert-icon {
-    font-size: 14px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  .alert-text { font-size: 12px; color: var(--text); line-height: 1.5; }
-  .alert-meta { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-  /* SUBMIT FORM */
-  .report-form {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 24px;
-  }
-
-  .form-row {
-    margin-bottom: 16px;
-  }
-
-  .form-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 8px;
-  }
-
-  .form-control {
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 10px 14px;
-    color: var(--text);
-    font-family: var(--font-display);
-    font-size: 13px;
-    transition: border-color 0.2s;
-    resize: vertical;
-  }
-
-  .form-control:focus {
-    outline: none;
-    border-color: var(--green);
-  }
-
-  select.form-control {
-    appearance: none;
-    cursor: pointer;
-  }
-
-  .btn-submit {
-    width: 100%;
-    background: var(--green);
-    color: #000;
-    border: none;
-    padding: 14px;
-    border-radius: 6px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: all 0.2s;
-    margin-top: 8px;
-  }
-
-  .btn-submit:hover { background: #00cc6a; transform: translateY(-1px); }
-  .btn-submit:active { transform: translateY(0); }
-
-  /* REPORTS FEED */
-  .reports-feed {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .report-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
-    transition: border-color 0.2s;
-    animation: slideIn 0.3s ease;
-  }
-
-  .report-card:hover { border-color: rgba(0,255,136,0.2); }
-
-  .report-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-  }
-
-  .report-role {
-    font-weight: 800;
-    font-size: 14px;
-  }
-
-  .report-role.Filipe { color: var(--green); }
-  .report-role.Loa { color: var(--blue); }
-  .report-role.Clinton { color: var(--yellow); }
-
-  .report-time {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--muted);
-  }
-
-  .report-field {
-    margin-bottom: 8px;
-  }
-
-  .report-field-label {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 3px;
-  }
-
-  .report-field-value {
-    font-size: 12px;
-    color: var(--text);
-    line-height: 1.5;
-  }
+  .tabs { display:flex; gap:1px; margin-bottom:22px; border-bottom:1px solid var(--border); overflow-x:auto; }
+  .tab { font-family:var(--font-mono); font-size:9px; letter-spacing:2px; text-transform:uppercase; padding:9px 16px; cursor:pointer; color:var(--muted); border-bottom:2px solid transparent; transition:all .2s; background:none; border-top:none; border-left:none; border-right:none; white-space:nowrap; }
+  .tab:hover { color:var(--text); }
+  .tab.active { color:var(--green); border-bottom-color:var(--green); }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  /* PHASE BANNER */
+  .phase-banner { background:linear-gradient(135deg,rgba(0,255,136,.07),rgba(0,170,255,.03)); border:1px solid rgba(0,255,136,.18); border-radius:8px; padding:13px 18px; margin-bottom:22px; display:flex; align-items:center; gap:14px; }
+  .ph-num { font-family:var(--font-mono); font-size:30px; font-weight:700; color:var(--green); opacity:.3; line-height:1; }
+  .ph-name { font-size:14px; font-weight:800; }
+  .ph-desc { font-size:11px; color:var(--muted); margin-top:3px; }
+  .ph-right { margin-left:auto; text-align:right; }
+  .ph-wlabel { font-family:var(--font-mono); font-size:9px; color:var(--muted); letter-spacing:2px; }
+  .ph-wval { font-family:var(--font-mono); font-size:20px; color:var(--text); font-weight:700; }
+
+  /* SECTION LABEL */
+  .slabel { font-family:var(--font-mono); font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; display:flex; align-items:center; gap:10px; }
+  .slabel::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* HEALTH GRID */
+  .hgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:24px; }
+  .hcard { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:13px; position:relative; overflow:hidden; }
+  .hcard::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--sc,var(--muted)); }
+  .hcard.green{--sc:var(--green);border-color:rgba(0,255,136,.12)} .hcard.yellow{--sc:var(--yellow);border-color:rgba(255,204,0,.12)} .hcard.red{--sc:var(--red);border-color:rgba(255,59,92,.12)}
+  .hcard-n { font-family:var(--font-mono); font-size:9px; color:var(--muted); margin-bottom:5px; }
+  .hcard-v { font-size:22px; font-weight:800; line-height:1; margin-bottom:2px; }
+  .hcard-t { font-family:var(--font-mono); font-size:9px; color:var(--muted); }
+  .sbadge { position:absolute; top:11px; right:11px; font-family:var(--font-mono); font-size:8px; letter-spacing:1px; padding:2px 6px; border-radius:3px; font-weight:700; }
+  .sbadge.green{background:rgba(0,255,136,.1);color:var(--green)} .sbadge.yellow{background:rgba(255,204,0,.1);color:var(--yellow)} .sbadge.red{background:rgba(255,59,92,.1);color:var(--red)}
+
+  /* STREAKS */
+  .sgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:24px; }
+  .scard { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:13px; text-align:center; }
+  .scard-name { font-size:13px; font-weight:800; margin-bottom:2px; }
+  .scard-role { font-family:var(--font-mono); font-size:8px; color:var(--muted); letter-spacing:2px; margin-bottom:8px; }
+  .scard-num { font-family:var(--font-mono); font-size:32px; font-weight:700; line-height:1; margin-bottom:2px; }
+  .scard-label { font-family:var(--font-mono); font-size:8px; color:var(--muted); }
+  .sdots { display:flex; gap:3px; justify-content:center; margin-top:9px; flex-wrap:wrap; }
+  .sdot { width:9px; height:9px; border-radius:2px; }
+
+  /* FOUNDER CARDS */
+  .fgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+  .fcard { background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:16px; }
+  .fcard-name { font-size:14px; font-weight:800; margin-bottom:2px; }
+  .fcard-role { font-family:var(--font-mono); font-size:8px; color:var(--green); letter-spacing:2px; margin-bottom:12px; }
+  .mrow { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border); font-size:11px; }
+  .mrow:last-child{border-bottom:none} .ml{color:var(--muted)} .mv{font-family:var(--font-mono);font-weight:700}
+  .mv.green{color:var(--green)} .mv.red{color:var(--red)} .mv.yellow{color:var(--yellow)}
+
+  /* TREND CHART */
+  .trend-wrap { background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:16px; margin-bottom:24px; }
+  .chart-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .chart-title { font-size:12px; font-weight:700; }
+  .cleg { display:flex; gap:12px; }
+  .leg { display:flex; align-items:center; gap:4px; font-family:var(--font-mono); font-size:8px; color:var(--muted); }
+  .leg-dot { width:7px; height:7px; border-radius:50%; }
+  .chart-area { display:flex; align-items:flex-end; gap:6px; height:90px; }
+  .bgrp { flex:1; display:flex; gap:2px; align-items:flex-end; }
+  .bar { flex:1; border-radius:2px 2px 0 0; transition:height .5s; cursor:pointer; position:relative; min-height:3px; }
+  .bar:hover::after { content:attr(data-v); position:absolute; top:-20px; left:50%; transform:translateX(-50%); font-family:var(--font-mono); font-size:8px; color:var(--text); background:var(--surface); border:1px solid var(--border); padding:2px 5px; border-radius:3px; white-space:nowrap; z-index:10; }
+  .bar.f{background:var(--green)} .bar.l{background:var(--blue)} .bar.c{background:var(--yellow)}
+  .cwks { display:flex; gap:6px; margin-top:5px; }
+  .wlbl { flex:1; text-align:center; font-family:var(--font-mono); font-size:8px; color:var(--muted); }
+
+  /* ROADMAP */
+  .rw-sel { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:18px; }
+  .rw-btn { font-family:var(--font-mono); font-size:9px; padding:5px 11px; border:1px solid var(--border); border-radius:4px; background:none; color:var(--muted); cursor:pointer; transition:all .2s; }
+  .rw-btn:hover{border-color:var(--green);color:var(--text)} .rw-btn.active{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.08)}
+  .rm-card { background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:18px; }
+  .rm-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .rm-title { font-size:15px; font-weight:800; }
+  .rm-phase { font-family:var(--font-mono); font-size:8px; color:var(--muted); letter-spacing:2px; margin-top:2px; }
+  .rm-obj { font-size:11px; color:var(--muted); margin-bottom:18px; padding:9px 13px; background:rgba(0,255,136,.05); border-left:2px solid var(--green); border-radius:0 4px 4px 0; line-height:1.5; }
+  .rm-role-sec { margin-bottom:14px; }
+  .rm-role-hdr { font-family:var(--font-mono); font-size:9px; letter-spacing:2px; margin-bottom:8px; padding-bottom:5px; border-bottom:1px solid var(--border); }
+  .rm-role-hdr.f{color:var(--green)} .rm-role-hdr.l{color:var(--blue)} .rm-role-hdr.c{color:var(--yellow)}
+  .rm-item { display:flex; align-items:flex-start; gap:9px; padding:7px 0; border-bottom:1px solid rgba(30,45,61,.5); font-size:12px; cursor:pointer; }
+  .rm-item:last-child{border-bottom:none}
+  .rm-chk { width:15px; height:15px; border:1px solid var(--border); border-radius:3px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:9px; transition:all .2s; margin-top:1px; }
+  .rm-item.done .rm-chk{background:rgba(0,255,136,.15);border-color:var(--green);color:var(--green)}
+  .rm-item.done .rm-txt{text-decoration:line-through;color:var(--muted)}
+  .rm-txt { flex:1; line-height:1.4; }
+  .blk-badge { font-family:var(--font-mono); font-size:8px; background:rgba(255,59,92,.1); color:var(--red); border:1px solid rgba(255,59,92,.2); padding:2px 6px; border-radius:3px; flex-shrink:0; }
+  .prog-wrap { background:var(--border); border-radius:4px; height:4px; margin:10px 0 16px; }
+  .prog-fill { background:var(--green); height:4px; border-radius:4px; transition:width .5s; }
+
+  /* PIPELINE */
+  .pipe-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .pipe-board { display:flex; gap:5px; overflow-x:auto; padding-bottom:4px; }
+  .pipe-col { flex:0 0 185px; background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:10px; }
+  .pipe-col-hdr { font-family:var(--font-mono); font-size:8px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:9px; display:flex; justify-content:space-between; }
+  .pipe-col-ct { background:var(--border); border-radius:10px; padding:1px 6px; font-size:8px; }
+  .deal-card { background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:9px 10px; margin-bottom:7px; cursor:pointer; transition:border-color .2s; }
+  .deal-card:hover{border-color:rgba(0,255,136,.3)}
+  .deal-name { font-size:12px; font-weight:700; margin-bottom:2px; }
+  .deal-contact { font-size:10px; color:var(--muted); margin-bottom:5px; }
+  .deal-ftr { display:flex; justify-content:space-between; align-items:center; }
+  .deal-days { font-family:var(--font-mono); font-size:8px; }
+  .deal-days.fresh{color:var(--green)} .deal-days.warn{color:var(--yellow)} .deal-days.stale{color:var(--red)}
+  .deal-next { font-size:9px; color:var(--muted); margin-top:4px; font-style:italic; }
+  .add-deal-btn { width:100%; background:none; border:1px dashed var(--border); border-radius:5px; padding:7px; color:var(--muted); font-family:var(--font-mono); font-size:9px; cursor:pointer; transition:all .2s; margin-top:3px; }
+  .add-deal-btn:hover{border-color:var(--green);color:var(--green)}
+
+  /* BLOCKERS LOG */
+  .blk-item { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:13px; margin-bottom:9px; }
+  .blk-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:7px; }
+  .blk-from { font-family:var(--font-mono); font-size:9px; letter-spacing:1px; }
+  .blk-from.Filipe{color:var(--green)} .blk-from.Loa{color:var(--blue)} .blk-from.Clinton{color:var(--yellow)}
+  .blk-date { font-family:var(--font-mono); font-size:8px; color:var(--muted); }
+  .blk-txt { font-size:12px; line-height:1.5; margin-bottom:9px; }
+  .blk-actions { display:flex; gap:7px; align-items:center; }
+  .blk-res-btn { font-family:var(--font-mono); font-size:8px; letter-spacing:1px; background:rgba(0,255,136,.08); border:1px solid rgba(0,255,136,.25); color:var(--green); padding:5px 11px; border-radius:4px; cursor:pointer; transition:all .2s; }
+  .blk-res-btn:hover{background:rgba(0,255,136,.18)}
+  .blk-resolved { font-family:var(--font-mono); font-size:9px; color:var(--green); }
+  .blk-note { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:5px 9px; color:var(--text); font-size:11px; font-family:var(--font-display); max-width:220px; }
+  .blk-note:focus{outline:none;border-color:var(--green)}
+
+  /* REPORTS */
+  .rep-card { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:13px; margin-bottom:9px; animation:fadeIn .3s; }
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+  .rep-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; }
+  .rep-role { font-size:13px; font-weight:800; }
+  .rep-role.Filipe{color:var(--green)} .rep-role.Loa{color:var(--blue)} .rep-role.Clinton{color:var(--yellow)}
+  .rep-time { font-family:var(--font-mono); font-size:8px; color:var(--muted); }
+  .rfl { font-family:var(--font-mono); font-size:8px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:2px; }
+  .rfv { font-size:12px; line-height:1.5; margin-bottom:7px; }
+
+  /* FORM */
+  .rep-form { background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:20px; }
+  .form-row { margin-bottom:13px; }
+  .form-lbl { font-family:var(--font-mono); font-size:8px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; display:block; margin-bottom:6px; }
+  .form-ctrl { width:100%; background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:8px 11px; color:var(--text); font-family:var(--font-display); font-size:13px; transition:border-color .2s; resize:vertical; }
+  .form-ctrl:focus{outline:none;border-color:var(--green)}
+  select.form-ctrl{appearance:none;cursor:pointer}
+  .btn-submit { width:100%; background:var(--green); color:#000; border:none; padding:12px; border-radius:5px; font-family:var(--font-mono); font-size:11px; font-weight:700; letter-spacing:3px; cursor:pointer; text-transform:uppercase; transition:all .2s; margin-top:5px; }
+  .btn-submit:hover{background:#00cc6a;transform:translateY(-1px)}
+
+  /* PARTNERS */
+  .pslots { display:flex; gap:7px; margin-bottom:14px; }
+  .pslot { flex:1; height:36px; border:1px dashed var(--border); border-radius:5px; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:8px; color:var(--muted); transition:all .3s; }
+  .pslot.filled{background:rgba(0,255,136,.07);border:1px solid var(--green);color:var(--green);font-weight:700}
+  .chk-item { display:flex; align-items:center; gap:9px; padding:7px 0; border-bottom:1px solid var(--border); font-size:12px; }
+  .chk-item:last-child{border-bottom:none} .chk-icon{font-size:12px;flex-shrink:0}
+  .chk-text.done{color:var(--muted);text-decoration:line-through}
 
   /* RIGHT PANEL */
-  .right-section-title {
-    font-weight: 700;
-    font-size: 13px;
-    margin-bottom: 14px;
-    color: var(--text);
-  }
+  .rp-title { font-family:var(--font-mono); font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:10px; margin-top:18px; }
+  .rp-title:first-child{margin-top:0}
+  .alert-item { display:flex; gap:9px; padding:8px 0; border-bottom:1px solid var(--border); }
+  .alert-item:last-child{border-bottom:none}
+  .alert-icon{font-size:12px;flex-shrink:0;margin-top:1px}
+  .alert-txt{font-size:11px;line-height:1.4}
+  .alert-meta{font-family:var(--font-mono);font-size:8px;margin-top:2px}
+  .wknav { display:flex; align-items:center; gap:7px; margin-bottom:12px; }
+  .wknav button { background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:3px 10px; border-radius:4px; cursor:pointer; font-family:var(--font-mono); font-size:10px; transition:all .2s; }
+  .wknav button:hover{border-color:var(--green);color:var(--green)}
+  .wknav-lbl { flex:1; text-align:center; font-family:var(--font-mono); font-size:10px; color:var(--green); font-weight:700; }
+  .cm-block { margin-bottom:12px; }
+  .cm-role { font-family:var(--font-mono); font-size:8px; letter-spacing:2px; color:var(--muted); margin-bottom:6px; }
+  .cm-item { display:flex; align-items:flex-start; gap:7px; padding:6px 8px; background:var(--surface2); border:1px solid var(--border); border-radius:4px; margin-bottom:4px; font-size:11px; cursor:pointer; }
+  .cm-item:hover{border-color:rgba(0,255,136,.3)}
+  .cm-item input[type="checkbox"]{width:12px;height:12px;accent-color:var(--green);cursor:pointer;flex-shrink:0;margin-top:1px}
+  .cm-txt.done{text-decoration:line-through;color:var(--muted)}
 
-  /* COMMITMENTS */
-  .commitment-block {
-    margin-bottom: 20px;
-  }
+  /* MEETING MODAL */
+  .modal-ov { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:500; display:none; align-items:center; justify-content:center; }
+  .modal-ov.active{display:flex}
+  .modal { background:var(--surface); border:1px solid rgba(168,85,247,.3); border-radius:12px; padding:26px; width:580px; max-width:95vw; max-height:90vh; overflow-y:auto; }
+  .modal-close { float:right; background:none; border:none; color:var(--muted); cursor:pointer; font-size:17px; }
+  .modal-title { font-size:18px; font-weight:800; margin-bottom:3px; }
+  .modal-sub { font-family:var(--font-mono); font-size:9px; color:var(--muted); letter-spacing:2px; margin-bottom:20px; }
+  .meet-prog { display:flex; gap:4px; margin-bottom:20px; }
+  .meet-seg { flex:1; height:5px; border-radius:3px; background:var(--border); transition:background .3s; }
+  .meet-seg.active{background:var(--purple)} .meet-seg.done{background:rgba(168,85,247,.3)}
+  .meet-phase { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:16px 18px; margin-bottom:10px; cursor:pointer; transition:border-color .2s; }
+  .meet-phase:hover{border-color:rgba(168,85,247,.3)}
+  .meet-phase.active{border-color:var(--purple);background:rgba(168,85,247,.05)}
+  .meet-phase.done{opacity:.45}
+  .mp-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; }
+  .mp-name { font-size:13px; font-weight:700; }
+  .mp-alloc { font-family:var(--font-mono); font-size:9px; color:var(--muted); }
+  .mp-cd { font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--purple); margin-bottom:5px; }
+  .mp-desc { font-size:11px; color:var(--muted); line-height:1.5; margin-bottom:7px; }
+  .mp-rule { font-size:11px; color:var(--muted); padding:2px 0; }
+  .mp-rule::before{content:'→ ';color:var(--purple)}
+  .meet-ctrls { display:flex; gap:8px; margin-top:18px; }
+  .meet-btn { flex:1; padding:11px; border-radius:5px; font-family:var(--font-mono); font-size:10px; letter-spacing:2px; cursor:pointer; transition:all .2s; border:none; }
+  .btn-start{background:var(--purple);color:#fff} .btn-start:hover{background:#9333ea}
+  .btn-skip{background:var(--surface2);color:var(--muted);border:1px solid var(--border) !important}
+  .btn-skip:hover{color:var(--text)} .btn-reset{background:none;color:var(--muted);border:1px solid var(--border) !important}
 
-  .commitment-name {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-  }
+  /* PARTNER/DEAL MODAL */
+  .sm-modal { background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:24px; width:440px; max-width:95vw; max-height:90vh; overflow-y:auto; }
+  .stage-opts { display:flex; flex-wrap:wrap; gap:5px; }
+  .sopt { padding:5px 11px; border:1px solid var(--border); border-radius:4px; font-family:var(--font-mono); font-size:8px; cursor:pointer; color:var(--muted); transition:all .2s; background:none; }
+  .sopt:hover,.sopt.active{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.07)}
 
-  .commitment-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    margin-bottom: 6px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+  /* MISC */
+  .btn-add { background:rgba(0,255,136,.07); border:1px solid rgba(0,255,136,.25); color:var(--green); padding:7px 14px; border-radius:5px; cursor:pointer; font-family:var(--font-mono); font-size:9px; letter-spacing:2px; transition:all .2s; }
+  .btn-add:hover{background:rgba(0,255,136,.15)}
+  .btn-del { background:none; border:none; color:var(--muted); cursor:pointer; font-size:12px; padding:0 3px; transition:color .2s; }
+  .btn-del:hover{color:var(--red)}
+  .empty-st { text-align:center; padding:26px; color:var(--muted); font-family:var(--font-mono); font-size:10px; }
+  .empty-ico { font-size:24px; margin-bottom:9px; opacity:.3; }
+  .toast { position:fixed; bottom:18px; right:18px; background:var(--surface); border:1px solid var(--green); border-radius:7px; padding:11px 16px; font-family:var(--font-mono); font-size:10px; color:var(--green); z-index:2000; transform:translateY(60px); opacity:0; transition:all .3s; }
+  .toast.show{transform:translateY(0);opacity:1}
 
-  .commitment-item:hover { border-color: var(--green); }
-
-  .commitment-item input[type="checkbox"] {
-    width: 14px;
-    height: 14px;
-    accent-color: var(--green);
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
-  .commitment-text { flex: 1; }
-  .commitment-text.done { text-decoration: line-through; color: var(--muted); }
-
-  /* WEEK SELECTOR */
-  .week-nav {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .week-nav button {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 6px 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    transition: all 0.2s;
-  }
-
-  .week-nav button:hover { border-color: var(--green); color: var(--green); }
-
-  .current-week {
-    flex: 1;
-    text-align: center;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--green);
-    font-weight: 700;
-  }
-
-  /* PHASE INDICATOR */
-  .phase-banner {
-    background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,170,255,0.04));
-    border: 1px solid rgba(0,255,136,0.2);
-    border-radius: 8px;
-    padding: 16px 20px;
-    margin-bottom: 28px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .phase-num {
-    font-family: var(--font-mono);
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--green);
-    line-height: 1;
-    opacity: 0.4;
-  }
-
-  .phase-details {}
-  .phase-name { font-size: 16px; font-weight: 800; }
-  .phase-desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-  .phase-weeks {
-    margin-left: auto;
-    text-align: right;
-  }
-
-  .phase-weeks-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
-  .phase-weeks-val { font-family: var(--font-mono); font-size: 20px; color: var(--text); font-weight: 700; }
-
-  /* MODAL */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 500;
-    display: none;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-overlay.active { display: flex; }
-
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 28px;
-    width: 480px;
-    max-width: 90vw;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-
-  .modal-title {
-    font-size: 18px;
-    font-weight: 800;
-    margin-bottom: 20px;
-  }
-
-  .modal-close {
-    float: right;
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 20px;
-    line-height: 1;
-  }
-
-  /* TOAST */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--surface);
-    border: 1px solid var(--green);
-    border-radius: 8px;
-    padding: 14px 20px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--green);
-    z-index: 1000;
-    transform: translateY(80px);
-    opacity: 0;
-    transition: all 0.3s;
-  }
-
-  .toast.show {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
-  /* PARTNER MODAL FORM */
-  .partner-form { display: flex; flex-direction: column; gap: 14px; }
-
-  .stage-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .stage-opt {
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    cursor: pointer;
-    color: var(--muted);
-    transition: all 0.2s;
-    background: none;
-  }
-
-  .stage-opt:hover, .stage-opt.active {
-    border-color: var(--green);
-    color: var(--green);
-    background: rgba(0,255,136,0.08);
-  }
-
-  .btn-add {
-    background: rgba(0,255,136,0.1);
-    border: 1px solid var(--green);
-    color: var(--green);
-    padding: 10px 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 2px;
-    transition: all 0.2s;
-  }
-
-  .btn-add:hover { background: rgba(0,255,136,0.2); }
-
-  .btn-delete {
-    background: none;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 14px;
-    padding: 0 4px;
-    transition: color 0.2s;
-  }
-
-  .btn-delete:hover { color: var(--red); }
-
-  /* EMPTY STATE */
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--muted);
-    font-family: var(--font-mono);
-    font-size: 12px;
-  }
-
-  .empty-state .icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
-
-  /* RESPONSIVE */
-  @media (max-width: 900px) {
-    .main { grid-template-columns: 1fr; }
-    .right-panel { border-top: 1px solid var(--border); }
-    .health-grid { grid-template-columns: repeat(2, 1fr); }
-    .founder-grid { grid-template-columns: 1fr; }
-  }
-
-  @media (max-width: 600px) {
-    .health-grid { grid-template-columns: 1fr; }
-    .header { padding: 14px 16px; }
-    .left-panel, .right-panel { padding: 20px 16px; }
-  }
+  @media(max-width:900px){.main{grid-template-columns:1fr}.right{border-top:1px solid var(--border)}.hgrid,.sgrid,.fgrid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:540px){.hgrid,.sgrid,.fgrid{grid-template-columns:1fr}.header{padding:10px 14px}.left,.right{padding:14px}}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="logo">REVOS <span>/ WAR ROOM</span></div>
-  <div style="display:flex;align-items:center;gap:16px;">
-    <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)" id="current-date"></span>
-    <div class="week-badge"><span class="live-dot"></span>LIVE</div>
+  <div class="hdr-right">
+    <span id="hdr-date" style="font-family:var(--font-mono);font-size:9px;color:var(--muted);"></span>
+    <button class="meeting-btn" onclick="openMeeting()">⚡ MONDAY MEETING</button>
+    <div class="live-badge"><span class="live-dot"></span>LIVE</div>
   </div>
 </div>
 
 <div class="main">
-  <!-- LEFT: Main Content -->
-  <div class="left-panel">
-    <!-- Phase Banner -->
-    <div class="phase-banner" id="phase-banner">
-      <div class="phase-num" id="phase-num">1</div>
-      <div class="phase-details">
-        <div class="phase-name" id="phase-name">Foundation</div>
-        <div class="phase-desc" id="phase-desc">Define category. Build proof. First demonstration.</div>
-      </div>
-      <div class="phase-weeks">
-        <div class="phase-weeks-label">WEEK</div>
-        <div class="phase-weeks-val" id="phase-week-display">—</div>
-      </div>
+  <div class="left">
+    <div class="phase-banner">
+      <div class="ph-num" id="ph-num">1</div>
+      <div><div class="ph-name" id="ph-name">Foundation</div><div class="ph-desc" id="ph-desc">Define category. Build proof. First demonstration.</div></div>
+      <div class="ph-right"><div class="ph-wlabel">WEEK</div><div class="ph-wval" id="ph-week">—</div></div>
     </div>
 
-    <!-- Tabs -->
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('dashboard', this)">Dashboard</button>
-      <button class="tab" onclick="switchTab('reports', this)">Reports</button>
-      <button class="tab" onclick="switchTab('submit', this)">Submit Report</button>
-      <button class="tab" onclick="switchTab('partners', this)">Design Partners</button>
+      <button class="tab active" onclick="switchTab('dashboard',this)">Dashboard</button>
+      <button class="tab" onclick="switchTab('roadmap',this)">Roadmap</button>
+      <button class="tab" onclick="switchTab('pipeline',this)">Pipeline</button>
+      <button class="tab" onclick="switchTab('blockers',this)">Blockers</button>
+      <button class="tab" onclick="switchTab('reports',this)">Reports</button>
+      <button class="tab" onclick="switchTab('submit',this)">Submit</button>
+      <button class="tab" onclick="switchTab('partners',this)">Partners</button>
     </div>
 
-    <!-- DASHBOARD TAB -->
+    <!-- DASHBOARD -->
     <div id="tab-dashboard" class="tab-content active">
-      <div class="section-label">Company Health</div>
-      <div class="health-grid" id="health-grid">
-        <!-- Dynamically populated -->
-      </div>
-
-      <div class="section-label">Founder Scorecards</div>
-      <div class="founder-grid" id="founder-grid">
-        <!-- Dynamically populated -->
-      </div>
-
-      <div class="section-label">Weekly Output Trend</div>
-      <div class="trend-chart">
-        <div class="chart-header">
-          <div class="chart-title">Reports Submitted Per Week</div>
-          <div class="chart-legend">
-            <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Filipe</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Loa</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div>Clinton</div>
+      <div class="slabel">Company Health</div>
+      <div class="hgrid" id="health-grid"></div>
+      <div class="slabel">Accountability Streaks</div>
+      <div class="sgrid" id="streak-grid"></div>
+      <div class="slabel">Founder Scorecards</div>
+      <div class="fgrid" id="founder-grid"></div>
+      <div class="slabel">Weekly Output Trend</div>
+      <div class="trend-wrap">
+        <div class="chart-hdr">
+          <div class="chart-title">Reports Per Week</div>
+          <div class="cleg">
+            <div class="leg"><div class="leg-dot" style="background:var(--green)"></div>Filipe</div>
+            <div class="leg"><div class="leg-dot" style="background:var(--blue)"></div>Loa</div>
+            <div class="leg"><div class="leg-dot" style="background:var(--yellow)"></div>Clinton</div>
           </div>
         </div>
         <div class="chart-area" id="chart-area"></div>
-        <div class="chart-weeks" id="chart-weeks"></div>
+        <div class="cwks" id="chart-weeks"></div>
       </div>
     </div>
 
-    <!-- REPORTS TAB -->
-    <div id="tab-reports" class="tab-content">
-      <div id="reports-feed" class="reports-feed">
-        <div class="empty-state"><div class="icon">📋</div>Loading reports...</div>
-      </div>
+    <!-- ROADMAP -->
+    <div id="tab-roadmap" class="tab-content">
+      <div class="rw-sel" id="rw-sel"></div>
+      <div id="rm-content"></div>
     </div>
 
-    <!-- SUBMIT TAB -->
+    <!-- PIPELINE -->
+    <div id="tab-pipeline" class="tab-content">
+      <div class="pipe-hdr">
+        <div><div style="font-size:15px;font-weight:800;">Deal Pipeline</div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:2px;">Red = not touched in 5+ days. Keep every deal warm.</div></div>
+        <button class="btn-add" onclick="openDealModal(null,null)">+ ADD DEAL</button>
+      </div>
+      <div class="pipe-board" id="pipe-board"></div>
+    </div>
+
+    <!-- BLOCKERS -->
+    <div id="tab-blockers" class="tab-content">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div><div style="font-size:15px;font-weight:800;">Blocker Resolution Log</div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:2px;">Every blocker must have an owner and deadline.</div></div>
+        <div style="display:flex;gap:7px;">
+          <button class="btn-add" id="bfilt-open" onclick="filterBlockers('open')">Open</button>
+          <button class="btn-add" id="bfilt-all" onclick="filterBlockers('all')" style="opacity:.4">All</button>
+        </div>
+      </div>
+      <div id="blockers-log"></div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="tab-reports" class="tab-content"><div id="reports-feed"></div></div>
+
+    <!-- SUBMIT -->
     <div id="tab-submit" class="tab-content">
-      <div class="report-form">
-        <div class="form-row">
-          <label class="form-label">Your Role</label>
-          <select id="form-role" class="form-control">
+      <div class="rep-form">
+        <div class="form-row"><label class="form-lbl">Your Role</label>
+          <select id="f-role" class="form-ctrl">
             <option value="Filipe">Filipe — CRO (Revenue)</option>
             <option value="Loa">Loa — CCO (Market Authority)</option>
             <option value="Clinton">Clinton — COO (Operations)</option>
           </select>
         </div>
-        <div class="form-row">
-          <label class="form-label">Outputs Shipped (What now exists in the world?)</label>
-          <textarea id="form-outputs" class="form-control" rows="3" placeholder="e.g. Updated pricing deck v2, Ran 3 discovery calls, Published LinkedIn article..."></textarea>
-        </div>
-        <div class="form-row">
-          <label class="form-label">Learnings (Observation → Meaning)</label>
-          <textarea id="form-learnings" class="form-control" rows="2" placeholder="e.g. Founders hate forecasting → Core pain is embarrassment, not accuracy"></textarea>
-        </div>
-        <div class="form-row">
-          <label class="form-label">Blockers (Problem → Who must solve → By when)</label>
-          <textarea id="form-blockers" class="form-control" rows="2" placeholder="e.g. Demo confusing → Loa → Wednesday"></textarea>
-        </div>
-        <div class="form-row">
-          <label class="form-label">Key Metrics This Week</label>
-          <textarea id="form-metrics" class="form-control" rows="2" placeholder="e.g. 27 outbound convos, 11 discovery calls, 2 offers made"></textarea>
-        </div>
-        <div class="form-row">
-          <label class="form-label">Next Week's Commitments (3 max — deliverables only)</label>
-          <textarea id="form-commitments" class="form-control" rows="2" placeholder="e.g. Homepage live with pipeline diagram, 10 discovery calls booked"></textarea>
-        </div>
-        <button class="btn-submit" onclick="submitReport()">SUBMIT REPORT →</button>
+        <div class="form-row"><label class="form-lbl">Outputs Shipped (what now exists in the world?)</label><textarea id="f-out" class="form-ctrl" rows="3" placeholder="e.g. Ran 10 discovery calls, Updated pricing deck v2..."></textarea></div>
+        <div class="form-row"><label class="form-lbl">Learnings (Observation → Meaning)</label><textarea id="f-learn" class="form-ctrl" rows="2" placeholder="e.g. Founders hate forecasting → Pain is embarrassment, not accuracy"></textarea></div>
+        <div class="form-row"><label class="form-lbl">Blockers (Problem → Who must solve → By when)</label><textarea id="f-blk" class="form-ctrl" rows="2" placeholder="e.g. Demo confusing → Loa → Wednesday"></textarea></div>
+        <div class="form-row"><label class="form-lbl">Key Metrics This Week</label><textarea id="f-met" class="form-ctrl" rows="2" placeholder="e.g. 27 outbound convos, 11 discovery calls, 2 offers made"></textarea></div>
+        <div class="form-row"><label class="form-lbl">Next Week Commitments (3 max — deliverables only)</label><textarea id="f-com" class="form-ctrl" rows="3" placeholder="Homepage live with pipeline diagram&#10;10 discovery calls booked&#10;Manual REVOS analysis delivered"></textarea></div>
+        <button class="btn-submit" onclick="submitReport()">SUBMIT WEEKLY REPORT →</button>
       </div>
     </div>
 
-    <!-- PARTNERS TAB -->
+    <!-- PARTNERS -->
     <div id="tab-partners" class="tab-content">
-      <div class="partner-tracker">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <div>
-            <div style="font-size:16px;font-weight:800;">Design Partner Progress</div>
-            <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:4px;">Target: 5 signed companies before engineers hired</div>
-          </div>
-          <button class="btn-add" onclick="openPartnerModal()">+ ADD PARTNER</button>
-        </div>
-        <div class="partner-progress" id="partner-slots"></div>
-        <div class="partner-list" id="partner-list">
-          <div class="empty-state"><div class="icon">🎯</div>No design partners yet. Close the first deal.</div>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div><div style="font-size:15px;font-weight:800;">Design Partners</div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:2px;">5 signed = engineers hired. Not before.</div></div>
+        <button class="btn-add" onclick="openPartnerModal()">+ ADD</button>
       </div>
-
-      <!-- Launch Readiness -->
-      <div class="section-label">Launch Readiness Checklist</div>
-      <div id="launch-checklist" style="display:flex;flex-direction:column;gap:8px;"></div>
+      <div class="pslots" id="pslots"></div>
+      <div id="plist"></div>
+      <div style="height:20px;"></div>
+      <div class="slabel">Engineer Hire Readiness</div>
+      <div id="launch-chk"></div>
     </div>
-
   </div>
 
-  <!-- RIGHT: Sidebar -->
-  <div class="right-panel">
-    <!-- Accountability Alerts -->
-    <div class="right-section-title">⚡ Accountability Alerts</div>
-    <div class="alerts-panel">
-      <div id="alerts-list">
-        <div class="empty-state" style="padding:20px 0;"><div class="icon" style="font-size:20px;">✅</div>No active alerts</div>
-      </div>
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="rp-title">⚡ Alerts</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:12px;"><div id="alerts-list"></div></div>
+    <div class="rp-title">Commitments</div>
+    <div class="wknav">
+      <button onclick="shiftWeek(-1)">←</button>
+      <div class="wknav-lbl" id="wknav-lbl">WEEK 1</div>
+      <button onclick="shiftWeek(1)">→</button>
     </div>
-
-    <!-- Week Navigation -->
-    <div class="right-section-title">Weekly Commitments</div>
-    <div class="week-nav">
-      <button onclick="changeWeek(-1)">←</button>
-      <div class="current-week" id="week-display">WEEK 1</div>
-      <button onclick="changeWeek(1)">→</button>
-    </div>
-
-    <!-- Commitments -->
-    <div id="commitments-panel"></div>
-
-    <div style="height:24px;"></div>
-
-    <!-- Blockers Board -->
-    <div class="right-section-title">🚧 Active Blockers</div>
-    <div id="blockers-board" style="display:flex;flex-direction:column;gap:8px;">
-      <div class="empty-state" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);text-align:center;padding:16px 0;">No active blockers</div>
-    </div>
+    <div id="commits-panel"></div>
+    <div class="rp-title" style="margin-top:20px;">🚧 Open Blockers</div>
+    <div id="sidebar-blk"></div>
   </div>
 </div>
 
-<!-- Add Partner Modal -->
-<div class="modal-overlay" id="partner-modal">
+<!-- MEETING MODAL -->
+<div class="modal-ov" id="meet-modal">
   <div class="modal">
-    <button class="modal-close" onclick="closePartnerModal()">✕</button>
-    <div class="modal-title">Add Design Partner</div>
-    <div class="partner-form">
-      <div class="form-row">
-        <label class="form-label">Company Name</label>
-        <input type="text" id="p-name" class="form-control" placeholder="e.g. Acme Corp">
-      </div>
-      <div class="form-row">
-        <label class="form-label">Contact Name</label>
-        <input type="text" id="p-contact" class="form-control" placeholder="e.g. Jane Smith">
-      </div>
-      <div class="form-row">
-        <label class="form-label">Stage</label>
-        <div class="stage-options" id="stage-options">
-          <button class="stage-opt" onclick="selectStage(this,'Outreach')">Outreach</button>
-          <button class="stage-opt" onclick="selectStage(this,'Discovery Call')">Discovery Call</button>
-          <button class="stage-opt" onclick="selectStage(this,'Offer Sent')">Offer Sent</button>
-          <button class="stage-opt" onclick="selectStage(this,'Signed')">Signed</button>
-          <button class="stage-opt" onclick="selectStage(this,'Active')">Active</button>
-        </div>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Notes</label>
-        <textarea id="p-notes" class="form-control" rows="2" placeholder="Key context, pain points, next action..."></textarea>
-      </div>
-      <button class="btn-submit" onclick="savePartner()">SAVE PARTNER →</button>
+    <button class="modal-close" onclick="closeModal('meet-modal')">✕</button>
+    <div class="modal-title">Monday Founder Council</div>
+    <div class="modal-sub">45 MINUTES · NON-OPTIONAL · EXECUTION ONLY</div>
+    <div class="meet-prog" id="meet-prog"></div>
+    <div id="meet-phases"></div>
+    <div class="meet-ctrls">
+      <button class="meet-btn btn-start" id="meet-start-btn" onclick="meetingAction()">START TIMER</button>
+      <button class="meet-btn btn-skip" onclick="skipPhase()">SKIP →</button>
+      <button class="meet-btn btn-reset" onclick="resetMeeting()">RESET</button>
     </div>
   </div>
 </div>
 
-<!-- Toast -->
+<!-- PARTNER MODAL -->
+<div class="modal-ov" id="partner-modal">
+  <div class="sm-modal">
+    <button class="modal-close" onclick="closeModal('partner-modal')">✕</button>
+    <div style="font-size:17px;font-weight:800;margin-bottom:16px;">Add Design Partner</div>
+    <div class="form-row"><label class="form-lbl">Company Name</label><input type="text" id="p-name" class="form-ctrl" placeholder="e.g. Acme Corp"></div>
+    <div class="form-row"><label class="form-lbl">Contact Name</label><input type="text" id="p-contact" class="form-ctrl" placeholder="e.g. Jane Smith"></div>
+    <div class="form-row"><label class="form-lbl">Stage</label>
+      <div class="stage-opts" id="partner-stage-opts">
+        <button class="sopt" onclick="selStage(this,'Outreach')">Outreach</button>
+        <button class="sopt" onclick="selStage(this,'Discovery Call')">Discovery Call</button>
+        <button class="sopt" onclick="selStage(this,'Offer Sent')">Offer Sent</button>
+        <button class="sopt" onclick="selStage(this,'Signed')">Signed</button>
+        <button class="sopt" onclick="selStage(this,'Active')">Active</button>
+      </div>
+    </div>
+    <div class="form-row"><label class="form-lbl">Notes</label><textarea id="p-notes" class="form-ctrl" rows="2" placeholder="Pain points, next action..."></textarea></div>
+    <button class="btn-submit" onclick="savePartner()">SAVE →</button>
+  </div>
+</div>
+
+<!-- DEAL MODAL -->
+<div class="modal-ov" id="deal-modal">
+  <div class="sm-modal">
+    <button class="modal-close" onclick="closeModal('deal-modal')">✕</button>
+    <div style="font-size:17px;font-weight:800;margin-bottom:16px;" id="deal-modal-title">Add Deal</div>
+    <div class="form-row"><label class="form-lbl">Company Name</label><input type="text" id="d-name" class="form-ctrl" placeholder="e.g. Summit Plumbing"></div>
+    <div class="form-row"><label class="form-lbl">Contact</label><input type="text" id="d-contact" class="form-ctrl" placeholder="e.g. Bob Smith, Owner"></div>
+    <div class="form-row"><label class="form-lbl">Stage</label>
+      <div class="stage-opts" id="deal-stage-opts">
+        <button class="sopt" onclick="selDealStage(this,'Outreach')">Outreach</button>
+        <button class="sopt" onclick="selDealStage(this,'First Call')">First Call</button>
+        <button class="sopt" onclick="selDealStage(this,'Discovery')">Discovery</button>
+        <button class="sopt" onclick="selDealStage(this,'Offer Sent')">Offer Sent</button>
+        <button class="sopt" onclick="selDealStage(this,'Negotiating')">Negotiating</button>
+        <button class="sopt" onclick="selDealStage(this,'Closed Won')">Closed Won</button>
+        <button class="sopt" onclick="selDealStage(this,'Closed Lost')">Closed Lost</button>
+      </div>
+    </div>
+    <div class="form-row"><label class="form-lbl">Next Action</label><input type="text" id="d-next" class="form-ctrl" placeholder="e.g. Follow-up call Thursday 2pm"></div>
+    <div class="form-row"><label class="form-lbl">Notes</label><textarea id="d-notes" class="form-ctrl" rows="2" placeholder="Key context, objections heard..."></textarea></div>
+    <input type="hidden" id="d-edit-id">
+    <button class="btn-submit" onclick="saveDeal()">SAVE DEAL →</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── CONFIGURATION ───────────────────────────────────────────
-const supabaseUrl = "https://zmfmvaedfrdwldhtfjmm.supabase.co";
-const supabaseKey = "sb_publishable_Wgamoaf3a1dlzdH9UFc9Pg_ziGt7Cwh";
-const db = supabase.createClient(supabaseUrl, supabaseKey);
+// ═══════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════
+const SUPA_URL = "https://zmfmvaedfrdwldhtfjmm.supabase.co";
+const SUPA_KEY = "sb_publishable_Wgamoaf3a1dlzdH9UFc9Pg_ziGt7Cwh";
+const db = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-// ─── STATE ────────────────────────────────────────────────────
-let allReports = [];
-let allPartners = [];
-let currentWeekOffset = 0;
-let selectedStage = '';
-let launchStartDate = null;
+let allReports=[], allPartners=[], allDeals=[], allBlockers=[];
+let weekOffset=0, bFilter='open', rmWeek=1;
+let selPStage='', selDStage='';
+let launchStart=null;
 
-// ─── INIT ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════
+// ROADMAP DATA
+// ═══════════════════════════════════════════
+const RM = {
+  1:{title:"Category Definition",phase:1,blocker:true,obj:"If this isn't clear → nothing converts. Everyone must explain REVOS in one conversation.",
+    f:["Write ICP definition (specific company profile)","Record pain narrative script (5-min explanation)","Draft pricing hypothesis — 3 tiers","Build objection list — top 25"],
+    l:["Write category positioning statement","Sketch homepage wireframe (structure not design)","Write problem recognition copy (above the fold)","Create REVOS explainer diagram"],
+    c:["Document enforcement logic v1 (how a deal becomes valid)","Draft required deal evidence checklist","List all data objects the system must track"]},
+  2:{title:"The Proof",phase:1,blocker:true,obj:"Must prove REVOS is real, not theory.",
+    f:["Schedule 10 founder interviews","Finalize discovery call script","Draft demo narrative outline"],
+    l:["Get first landing page live (no perfection)","Create visual pipeline enforcement graphic","Write founder pain case story page"],
+    c:["Build mock workflow (manual spreadsheet version)","Create example scorecard output","Write onboarding checklist v1"]},
+  3:{title:"First Demonstration",phase:1,blocker:true,obj:"Must show a working concept in a live conversation.",
+    f:["Run 5 live problem diagnosis calls","Record reactions + objections","Refine offer language from feedback"],
+    l:["Create demo slides","Design visual dashboard mockups","Record 90-second explanation video"],
+    c:["Run manual REVOS simulation on sample pipeline","Produce first compliance score output","Document exact logic steps taken"]},
+  4:{title:"Design Partner Acquisition I",phase:2,blocker:false,obj:"Target: First signed company. Sell BEFORE software exists.",
+    f:["Complete 50 outbound conversations","Close 1 design partner","Build ROI calculator"],
+    l:["Create case-style explainer page","Record demo walkthrough video","Design objection response visuals"],
+    c:["Draft customer onboarding framework","Create implementation timeline","Build required customer data sheet"]},
+  5:{title:"Design Partner Acquisition II",phase:2,blocker:false,obj:"Deepen outreach. Move first partner into implementation.",
+    f:["50 additional outbound conversations","Confirm first partner is active","Test ROI calculator with real numbers"],
+    l:["Refine demo based on call feedback","Update landing page messaging","Create onboarding welcome assets"],
+    c:["Start first partner implementation","Document real onboarding steps","Create week 1 partner check-in template"]},
+  6:{title:"Repeatability I",phase:2,blocker:false,obj:"Target: 3 design partners total. Prove the sales motion repeats.",
+    f:["Close 2 more companies (total 3)","Build referral script","Validate pricing with real conversations"],
+    l:["Publish 3 LinkedIn authority posts","Draft RevOps education article","Create sales deck v2"],
+    c:["Write standard onboarding SOP","Create weekly reporting format template","Build adoption tracking method"]},
+  7:{title:"Repeatability II",phase:2,blocker:false,obj:"Solidify 3 partners. System must run without founder babysitting.",
+    f:["Deliver 3 ROI updates to active partners","Test referral script with 5 contacts","Document what's working in the sales script"],
+    l:["Publish 2 more authority posts","Launch email nurture sequence (3 emails)","Update sales deck with case data"],
+    c:["Confirm onboarding SOP works without you","Produce 3 weekly compliance reports","Reduce onboarding time vs week 5"]},
+  8:{title:"Operational Proof",phase:2,blocker:true,obj:"Show measurable improvement. Investors and future customers need this.",
+    f:["Gather before/after metrics from all partners","Record 2+ video testimonials","Write case study interview notes"],
+    l:["Publish 2 case study pages","Create social proof assets library","Design investor-ready results slide"],
+    c:["Produce first formal compliance report","Show forecast improvement data","Document manual process that will become software"]},
+  9:{title:"Authority Position I",phase:3,blocker:false,obj:"Market must start to believe this category exists.",
+    f:["Host live webinar presentation","Draft investor narrative","Close partner #4"],
+    l:["Launch authority landing page","Publish category-defining article","Release demo video v2"],
+    c:["Write automation spec (what engineers will build)","Draft data schema v1","List all integration requirements"]},
+  10:{title:"Authority Position II",phase:3,blocker:false,obj:"Amplify signal. More conversations. More evidence.",
+    f:["Run 5 additional investor conversations","Collect 3 more testimonials","Document competitor comparison"],
+    l:["Publish 3 social proof posts","Run webinar replay campaign","Create comparison landing page"],
+    c:["Review data schema with engineering candidate","Finalize integration requirements","Write API spec v1"]},
+  11:{title:"Launch Preparation",phase:3,blocker:false,obj:"Get everything ready. 5 partners within reach.",
+    f:["Close partner #5","Lock final pricing","Document complete sales process"],
+    l:["Get full website live","Write launch announcement content","Complete sales assets library"],
+    c:["Finalize engineering PRD","Complete implementation handbook","Write customer success playbook v1"]},
+  12:{title:"Launch Ready",phase:3,blocker:true,obj:"5 paying design partners. Before/after proven. Onboarding repeatable. Engineers hired.",
+    f:["Confirm all 5 design partners are active","Deliver final sales process documentation","Prepare investor update deck"],
+    l:["Full website live and tested","All sales assets complete","Launch sequence ready to execute"],
+    c:["Engineering hiring process started","All SOPs handed to incoming team","Customer success system operational"]}
+};
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
 async function init() {
-  document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
-  
-  // Load launch start from local storage (or default to 12 weeks ago from now for demo)
-  const stored = localStorage.getItem('revos_launch_start');
-  if (stored) {
-    launchStartDate = new Date(stored);
-  } else {
-    launchStartDate = new Date();
-    localStorage.setItem('revos_launch_start', launchStartDate.toISOString());
-  }
-
-  updateWeekDisplay();
-  updatePhase();
-  await loadReports();
-  await loadPartners();
-  renderDashboard();
-  renderLaunchChecklist();
+  document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  const s=localStorage.getItem('revos_start');
+  launchStart = s?new Date(s):new Date();
+  if(!s) localStorage.setItem('revos_start',launchStart.toISOString());
+  rmWeek=getCW();
+  updatePhase(); updateWkNav();
+  renderRmSel();
+  await Promise.all([loadR(),loadP(),loadD(),loadB()]);
+  renderAll();
+  subscribe();
+  initMeeting();
 }
 
-// ─── WEEK LOGIC ───────────────────────────────────────────────
-function getCurrentWeekNumber() {
-  const now = new Date();
-  const diff = now - launchStartDate;
-  return Math.max(1, Math.ceil(diff / (7 * 24 * 60 * 60 * 1000)));
+const getCW=()=>Math.max(1,Math.min(12,Math.ceil((new Date()-launchStart)/(7*24*60*60*1000))));
+
+// ═══════════════════════════════════════════
+// LOADERS
+// ═══════════════════════════════════════════
+async function loadR(){try{const{data,error}=await db.from('founder_reports').select('*').order('created_at',{ascending:false});if(error)throw error;allReports=data||[];}catch(e){allReports=[];}}
+async function loadP(){try{const{data,error}=await db.from('design_partners').select('*').order('created_at',{ascending:false});if(error)throw error;allPartners=data||[];}catch(e){allPartners=[];}}
+async function loadD(){try{const{data,error}=await db.from('deals').select('*').order('last_touched',{ascending:false});if(error)throw error;allDeals=data||[];}catch(e){allDeals=[];}}
+async function loadB(){try{const{data,error}=await db.from('blockers').select('*').order('created_at',{ascending:false});if(error)throw error;allBlockers=data||[];}catch(e){allBlockers=[];}}
+
+// ═══════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════
+function renderAll(){renderHealth();renderStreaks();renderFounders();renderChart();renderRm();renderPipe();renderBlog();renderReports();renderPartners();renderLaunch();renderAlerts();renderCommits();renderSideBlk();}
+
+// ═══════════════════════════════════════════
+// PHASE
+// ═══════════════════════════════════════════
+function updatePhase(){
+  const w=getCW();
+  let ph=1,n='Foundation',d='Define category. Build proof. First demonstration.';
+  if(w>=4&&w<=8){ph=2;n='Market Entry';d='Sell BEFORE software exists. Close first design partners.';}
+  if(w>=9){ph=3;n='Pre-Software Validation';d='Prove demand. Prepare engineering spec. Launch ready.';}
+  document.getElementById('ph-num').textContent=ph;
+  document.getElementById('ph-name').textContent=n;
+  document.getElementById('ph-desc').textContent=d;
+  document.getElementById('ph-week').textContent=w+'/12';
 }
 
-function changeWeek(dir) {
-  currentWeekOffset += dir;
-  updateWeekDisplay();
-  renderCommitments();
-}
-
-function updateWeekDisplay() {
-  const weekNum = getCurrentWeekNumber() + currentWeekOffset;
-  document.getElementById('week-display').textContent = `WEEK ${Math.max(1, weekNum)}`;
-  document.getElementById('phase-week-display').textContent = getCurrentWeekNumber();
-}
-
-function updatePhase() {
-  const week = getCurrentWeekNumber();
-  let phase = 1, name = 'Foundation', desc = 'Define category. Build proof. First demonstration.';
-  if (week >= 4 && week <= 8) { phase = 2; name = 'Market Entry'; desc = 'Sell BEFORE software exists. Close first design partners.'; }
-  if (week >= 9) { phase = 3; name = 'Pre-Software Validation'; desc = 'Prove demand. Prepare engineering spec. Launch ready.'; }
-
-  document.getElementById('phase-num').textContent = phase;
-  document.getElementById('phase-name').textContent = name;
-  document.getElementById('phase-desc').textContent = desc;
-}
-
-// ─── SUPABASE ─────────────────────────────────────────────────
-async function loadReports() {
-  try {
-    const { data, error } = await db.from('founder_reports').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
-    allReports = data || [];
-    renderReports();
-    renderDashboard();
-    renderAlerts();
-  } catch (e) {
-    console.warn('Supabase error (reports):', e.message);
-    allReports = [];
-    renderReports();
-  }
-}
-
-async function loadPartners() {
-  try {
-    const { data, error } = await db.from('design_partners').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
-    allPartners = data || [];
-    renderPartners();
-  } catch (e) {
-    console.warn('Supabase error (partners):', e.message);
-    allPartners = [];
-    renderPartners();
-  }
-}
-
-async function submitReport() {
-  const role = document.getElementById('form-role').value;
-  const outputs = document.getElementById('form-outputs').value.trim();
-  const learnings = document.getElementById('form-learnings').value.trim();
-  const blockers = document.getElementById('form-blockers').value.trim();
-  const metrics = document.getElementById('form-metrics').value.trim();
-  const commitments = document.getElementById('form-commitments').value.trim();
-
-  if (!outputs) { showToast('⚠ Outputs are required'); return; }
-
-  const week = getCurrentWeekNumber();
-
-  try {
-    await db.from('founder_reports').insert([{ role, outputs, learnings, blockers, metrics, commitments, week }]);
-    showToast('✓ Report submitted');
-    document.getElementById('form-outputs').value = '';
-    document.getElementById('form-learnings').value = '';
-    document.getElementById('form-blockers').value = '';
-    document.getElementById('form-metrics').value = '';
-    document.getElementById('form-commitments').value = '';
-    await loadReports();
-    switchTab('reports', document.querySelector('.tab'));
-  } catch (e) {
-    showToast('Error: ' + e.message);
-  }
-}
-
-async function savePartner() {
-  const name = document.getElementById('p-name').value.trim();
-  const contact = document.getElementById('p-contact').value.trim();
-  const notes = document.getElementById('p-notes').value.trim();
-
-  if (!name) { showToast('⚠ Company name required'); return; }
-  if (!selectedStage) { showToast('⚠ Select a stage'); return; }
-
-  const stageColors = { 'Outreach': '#5a7085', 'Discovery Call': '#00aaff', 'Offer Sent': '#ffcc00', 'Signed': '#00ff88', 'Active': '#00ff88' };
-  const color = stageColors[selectedStage] || '#5a7085';
-
-  try {
-    await db.from('design_partners').insert([{ name, contact, stage: selectedStage, notes, color }]);
-    showToast('✓ Partner added');
-    closePartnerModal();
-    await loadPartners();
-    renderLaunchChecklist();
-  } catch (e) {
-    showToast('Error: ' + e.message);
-  }
-}
-
-async function deletePartner(id) {
-  try {
-    await db.from('design_partners').delete().eq('id', id);
-    await loadPartners();
-    renderLaunchChecklist();
-    showToast('Partner removed');
-  } catch (e) {
-    showToast('Error: ' + e.message);
-  }
-}
-
-// ─── RENDER: DASHBOARD ────────────────────────────────────────
-function renderDashboard() {
-  renderHealthGrid();
-  renderFounderCards();
-  renderTrendChart();
-  renderCommitments();
-  renderBlockers();
-}
-
-function renderHealthGrid() {
-  const thisWeekReports = allReports.filter(r => r.week === getCurrentWeekNumber());
-  const roles = ['Filipe', 'Loa', 'Clinton'];
-  const reportsByRole = {};
-  roles.forEach(r => reportsByRole[r] = thisWeekReports.filter(rep => rep.role === r));
-
-  const signedPartners = allPartners.filter(p => p.stage === 'Signed' || p.stage === 'Active').length;
-
-  const metrics = [
-    { name: 'Convos This Week', val: '—', target: '25 target', owner: 'Filipe', status: getStatus('—', 25, 'num') },
-    { name: 'Reports Submitted', val: thisWeekReports.length + '/3', target: '3 required', status: thisWeekReports.length >= 3 ? 'green' : thisWeekReports.length >= 1 ? 'yellow' : 'red' },
-    { name: 'Design Partners', val: signedPartners + '/5', target: '5 to launch', status: signedPartners >= 5 ? 'green' : signedPartners >= 2 ? 'yellow' : signedPartners >= 1 ? 'yellow' : 'red' },
-    { name: 'Assets Shipped', val: '—', target: '2/week target', owner: 'Loa', status: 'yellow' },
-    { name: 'Analyses Delivered', val: '—', target: '3/week target', owner: 'Clinton', status: 'yellow' },
-    { name: 'Week', val: getCurrentWeekNumber() + '/12', target: 'Pre-launch', status: getCurrentWeekNumber() <= 12 ? 'green' : 'red' },
+// ═══════════════════════════════════════════
+// HEALTH
+// ═══════════════════════════════════════════
+function renderHealth(){
+  const cw=getCW();
+  const tw=allReports.filter(r=>r.week===cw);
+  const signed=allPartners.filter(p=>p.stage==='Signed'||p.stage==='Active').length;
+  const active=allDeals.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost').length;
+  const closed=allDeals.filter(d=>d.stage==='Closed Won').length;
+  const openB=allBlockers.filter(b=>!b.resolved).length;
+  const metrics=[
+    {n:'Reports This Week',v:tw.length+'/3',t:'3 required',s:tw.length>=3?'green':tw.length>=1?'yellow':'red'},
+    {n:'Design Partners',v:signed+'/5',t:'5 to hire engineers',s:signed>=5?'green':signed>=2?'yellow':'red'},
+    {n:'Active Deals',v:active,t:'pipeline prospects',s:active>=10?'green':active>=3?'yellow':'red'},
+    {n:'Closed Won',v:closed,t:'revenue proof',s:closed>=5?'green':closed>=1?'yellow':'red'},
+    {n:'Open Blockers',v:openB,t:'target: 0',s:openB===0?'green':openB<=2?'yellow':'red'},
+    {n:'Launch Week',v:cw+'/12',t:'pre-launch timeline',s:cw<=10?'green':cw<=12?'yellow':'red'},
   ];
-
-  const labels = { green: '● ON TRACK', yellow: '● AT RISK', red: '● BEHIND' };
-
-  document.getElementById('health-grid').innerHTML = metrics.map(m => `
-    <div class="health-card ${m.status}">
-      <div class="status-badge ${m.status}">${labels[m.status]}</div>
-      <div class="health-metric-name">${m.name}</div>
-      <div class="health-value">${m.val}</div>
-      <div class="health-target">${m.target}</div>
-    </div>
+  const lbs={green:'● ON TRACK',yellow:'● AT RISK',red:'● BEHIND'};
+  document.getElementById('health-grid').innerHTML=metrics.map(m=>`
+    <div class="hcard ${m.s}"><div class="sbadge ${m.s}">${lbs[m.s]}</div>
+    <div class="hcard-n">${m.n}</div><div class="hcard-v">${m.v}</div><div class="hcard-t">${m.t}</div></div>
   `).join('');
 }
 
-function getStatus(val, target, type) {
-  if (type === 'num') {
-    if (val === '—') return 'yellow';
-    const n = parseFloat(val);
-    if (n >= target) return 'green';
-    if (n >= target * 0.6) return 'yellow';
-    return 'red';
-  }
-  return 'yellow';
+// ═══════════════════════════════════════════
+// STREAKS
+// ═══════════════════════════════════════════
+function calcStreak(role){
+  const cw=getCW(); let s=0;
+  for(let w=cw;w>=1;w--){if(allReports.some(r=>r.role===role&&r.week===w))s++;else break;}
+  return s;
 }
 
-function renderFounderCards() {
-  const founders = [
-    {
-      name: 'Filipe', role: 'CRO · REVENUE',
-      metrics: [
-        { label: 'Outbound Convos', target: '25/wk', val: getLatestMetric('Filipe', 'convo') },
-        { label: 'Discovery Calls', target: '10/wk', val: getLatestMetric('Filipe', 'call') },
-        { label: 'Reports Filed', target: 'weekly', val: getReportsCount('Filipe') },
-        { label: 'Offers Made', target: '3/wk', val: '—' },
-      ]
-    },
-    {
-      name: 'Loa', role: 'CCO · MARKET AUTHORITY',
-      metrics: [
-        { label: 'Assets Shipped', target: '2/wk', val: '—' },
-        { label: 'Message Refinements', target: '3/wk', val: '—' },
-        { label: 'Reports Filed', target: 'weekly', val: getReportsCount('Loa') },
-        { label: 'Demo Updates', target: '1/wk', val: '—' },
-      ]
-    },
-    {
-      name: 'Clinton', role: 'COO · OPERATIONS',
-      metrics: [
-        { label: 'Analyses Delivered', target: '3/wk', val: '—' },
-        { label: 'Process Steps Docs', target: '3/wk', val: '—' },
-        { label: 'Reports Filed', target: 'weekly', val: getReportsCount('Clinton') },
-        { label: 'Onboarding Improv.', target: 'weekly', val: '—' },
-      ]
-    }
-  ];
-
-  document.getElementById('founder-grid').innerHTML = founders.map(f => `
-    <div class="founder-card">
-      <div class="founder-name">${f.name}</div>
-      <div class="founder-role">${f.role}</div>
-      ${f.metrics.map(m => `
-        <div class="metric-row">
-          <span class="label">${m.label}</span>
-          <span class="val ${getValColor(m.val, m.target)}">${m.val}</span>
-        </div>
-      `).join('')}
-    </div>
-  `).join('');
-}
-
-function getLatestMetric(role, type) {
-  const recent = allReports.filter(r => r.role === role)[0];
-  if (!recent) return '—';
-  return '—'; // Would parse from metrics text
-}
-
-function getReportsCount(role) {
-  const thisWeek = allReports.filter(r => r.role === role && r.week === getCurrentWeekNumber()).length;
-  return thisWeek > 0 ? '✓ Filed' : '✗ Missing';
-}
-
-function getValColor(val, target) {
-  if (val === '✓ Filed') return 'green';
-  if (val === '✗ Missing') return 'red';
-  if (val === '—') return '';
-  return 'green';
-}
-
-function renderTrendChart() {
-  // Group reports by week
-  const weeks = {};
-  allReports.forEach(r => {
-    const w = r.week || 1;
-    if (!weeks[w]) weeks[w] = { Filipe: 0, Loa: 0, Clinton: 0 };
-    if (weeks[w][r.role] !== undefined) weeks[w][r.role]++;
-  });
-
-  const currentWeek = getCurrentWeekNumber();
-  const startWeek = Math.max(1, currentWeek - 5);
-  const displayWeeks = [];
-  for (let i = startWeek; i <= currentWeek; i++) displayWeeks.push(i);
-
-  const allVals = displayWeeks.flatMap(w => [
-    (weeks[w] || {}).Filipe || 0,
-    (weeks[w] || {}).Loa || 0,
-    (weeks[w] || {}).Clinton || 0
-  ]);
-  const maxVal = Math.max(1, ...allVals);
-
-  const chartArea = document.getElementById('chart-area');
-  const chartWeeks = document.getElementById('chart-weeks');
-
-  chartArea.innerHTML = displayWeeks.map(w => {
-    const d = weeks[w] || { Filipe: 0, Loa: 0, Clinton: 0 };
+function renderStreaks(){
+  const cw=getCW();
+  const founders=[['Filipe','CRO'],['Loa','CCO'],['Clinton','COO']];
+  document.getElementById('streak-grid').innerHTML=founders.map(([f,r])=>{
+    const streak=calcStreak(f);
+    const col=streak>=4?'var(--green)':streak>=2?'var(--yellow)':'var(--red)';
+    const weeks=[]; let missed=0;
+    for(let w=cw;w>=Math.max(1,cw-7);w--){const filed=allReports.some(rp=>rp.role===f&&rp.week===w);weeks.unshift({w,filed});}
+    const dots=weeks.map(w=>`<div class="sdot" style="background:${w.filed?'var(--green)':'var(--red)'}" title="W${w.w}:${w.filed?'✓':'✗'}"></div>`).join('');
+    const missedCt=weeks.filter(w=>!w.filed).length;
     return `
-      <div class="bar-group">
-        <div class="bar filipe" style="height:${Math.max(4, (d.Filipe / maxVal) * 110)}px" data-val="Filipe: ${d.Filipe}"></div>
-        <div class="bar loa" style="height:${Math.max(4, (d.Loa / maxVal) * 110)}px" data-val="Loa: ${d.Loa}"></div>
-        <div class="bar clinton" style="height:${Math.max(4, (d.Clinton / maxVal) * 110)}px" data-val="Clinton: ${d.Clinton}"></div>
-      </div>
-    `;
-  }).join('');
-
-  chartWeeks.innerHTML = displayWeeks.map(w => `<div class="week-label">W${w}</div>`).join('');
-}
-
-// ─── RENDER: REPORTS FEED ─────────────────────────────────────
-function renderReports() {
-  const container = document.getElementById('reports-feed');
-  if (!allReports.length) {
-    container.innerHTML = '<div class="empty-state"><div class="icon">📋</div>No reports yet. Submit the first one.</div>';
-    return;
-  }
-
-  container.innerHTML = allReports.map(r => {
-    const date = new Date(r.created_at);
-    const timeStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' · W' + (r.week || '—');
-    return `
-      <div class="report-card">
-        <div class="report-header">
-          <div class="report-role ${r.role}">${r.role} <span style="color:var(--muted);font-size:12px;font-weight:400">${r.role === 'Filipe' ? '(CRO)' : r.role === 'Loa' ? '(CCO)' : '(COO)'}</span></div>
-          <div class="report-time">${timeStr}</div>
-        </div>
-        ${r.outputs ? `<div class="report-field"><div class="report-field-label">Outputs</div><div class="report-field-value">${r.outputs}</div></div>` : ''}
-        ${r.learnings ? `<div class="report-field"><div class="report-field-label">Learnings</div><div class="report-field-value">${r.learnings}</div></div>` : ''}
-        ${r.blockers ? `<div class="report-field"><div class="report-field-label">Blockers</div><div class="report-field-value" style="color:var(--yellow)">${r.blockers}</div></div>` : ''}
-        ${r.metrics ? `<div class="report-field"><div class="report-field-label">Metrics</div><div class="report-field-value">${r.metrics}</div></div>` : ''}
-        ${r.commitments ? `<div class="report-field"><div class="report-field-label">Next Week</div><div class="report-field-value" style="color:var(--green)">${r.commitments}</div></div>` : ''}
+      <div class="scard">
+        <div class="scard-name">${f}</div><div class="scard-role">${r}</div>
+        <div class="scard-num" style="color:${col}">${streak}</div>
+        <div class="scard-label">WEEK STREAK</div>
+        ${missedCt>=2?`<div style="font-family:var(--font-mono);font-size:8px;color:var(--red);margin-top:5px;">⚠ ${missedCt} MISSED</div>`:''}
+        <div class="sdots">${dots}</div>
       </div>
     `;
   }).join('');
 }
 
-// ─── RENDER: PARTNERS ─────────────────────────────────────────
-function renderPartners() {
-  const slots = document.getElementById('partner-slots');
-  const list = document.getElementById('partner-list');
-
-  // Slots
-  slots.innerHTML = Array.from({ length: 5 }, (_, i) => {
-    const p = allPartners[i];
-    if (p && (p.stage === 'Signed' || p.stage === 'Active')) {
-      return `<div class="partner-slot filled">✓ ${p.name.split(' ')[0]}</div>`;
-    }
-    return `<div class="partner-slot">${i + 1}</div>`;
-  }).join('');
-
-  // List
-  if (!allPartners.length) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">🎯</div>No design partners yet. Close the first deal.</div>';
-    return;
-  }
-
-  const stageColors = { 'Outreach': 'var(--muted)', 'Discovery Call': 'var(--blue)', 'Offer Sent': 'var(--yellow)', 'Signed': 'var(--green)', 'Active': 'var(--green)' };
-
-  list.innerHTML = allPartners.map(p => `
-    <div class="partner-item">
-      <div class="partner-status" style="background:${stageColors[p.stage] || 'var(--muted)'}"></div>
-      <div class="partner-name">${p.name}</div>
-      ${p.contact ? `<div class="partner-stage">${p.contact}</div>` : ''}
-      <div class="partner-stage" style="color:${stageColors[p.stage] || 'var(--muted)'}">${p.stage}</div>
-      <button class="btn-delete" onclick="deletePartner(${p.id})" title="Remove">✕</button>
-    </div>
-  `).join('');
-}
-
-// ─── RENDER: ALERTS ───────────────────────────────────────────
-function renderAlerts() {
-  const alerts = [];
-  const currentWeek = getCurrentWeekNumber();
-
-  // Check for missing reports this week
-  const thisWeekReports = allReports.filter(r => r.week === currentWeek);
-  const reportedRoles = thisWeekReports.map(r => r.role);
-  const allRoles = ['Filipe', 'Loa', 'Clinton'];
-
-  allRoles.forEach(role => {
-    if (!reportedRoles.includes(role)) {
-      alerts.push({ icon: '⚠️', text: `${role} has not submitted a report for Week ${currentWeek}`, meta: 'Report missing', severity: 'red' });
-    }
-  });
-
-  // Check partners
-  const signedCount = allPartners.filter(p => p.stage === 'Signed' || p.stage === 'Active').length;
-  if (signedCount === 0 && currentWeek >= 4) {
-    alerts.push({ icon: '🚨', text: 'No signed design partners yet — Week 4+ target requires first close', meta: 'Revenue blocker', severity: 'red' });
-  }
-
-  if (currentWeek >= 6 && signedCount < 2) {
-    alerts.push({ icon: '📊', text: 'Week 6–7 target is 3 design partners — currently behind', meta: 'Pace alert', severity: 'yellow' });
-  }
-
-  // Blockers from reports
-  const recentBlockers = allReports.filter(r => r.blockers && r.blockers.trim() && r.week === currentWeek);
-  recentBlockers.forEach(r => {
-    alerts.push({ icon: '🔧', text: `${r.role}: ${r.blockers}`, meta: `Week ${r.week} blocker`, severity: 'yellow' });
-  });
-
-  const container = document.getElementById('alerts-list');
-  if (!alerts.length) {
-    container.innerHTML = '<div class="empty-state" style="padding:16px 0;"><div class="icon" style="font-size:20px;">✅</div>No active alerts</div>';
-    return;
-  }
-
-  container.innerHTML = alerts.map(a => `
-    <div class="alert-item">
-      <div class="alert-icon">${a.icon}</div>
-      <div>
-        <div class="alert-text">${a.text}</div>
-        <div class="alert-meta" style="color:${a.severity === 'red' ? 'var(--red)' : 'var(--yellow)'}">${a.meta}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ─── RENDER: COMMITMENTS ──────────────────────────────────────
-function renderCommitments() {
-  const weekNum = getCurrentWeekNumber() + currentWeekOffset;
-  const weekReports = allReports.filter(r => r.week === weekNum && r.commitments);
-  const container = document.getElementById('commitments-panel');
-
-  if (!weekReports.length) {
-    container.innerHTML = '<div class="empty-state" style="font-family:var(--font-mono);font-size:11px;color:var(--muted);text-align:center;padding:20px 0;">No commitments filed for this week yet</div>';
-    return;
-  }
-
-  const storageKey = `revos_commits_w${weekNum}`;
-  let checked = JSON.parse(localStorage.getItem(storageKey) || '{}');
-
-  container.innerHTML = weekReports.map(r => {
-    const lines = r.commitments.split('\n').filter(l => l.trim());
-    return `
-      <div class="commitment-block">
-        <div class="commitment-name">${r.role.toUpperCase()}</div>
-        ${lines.map((line, i) => {
-          const key = `${r.id}_${i}`;
-          const done = checked[key];
-          return `
-            <div class="commitment-item" onclick="toggleCommit('${storageKey}', '${key}', this)">
-              <input type="checkbox" ${done ? 'checked' : ''} onclick="event.stopPropagation();toggleCommit('${storageKey}', '${key}', this.parentElement)">
-              <div class="commitment-text ${done ? 'done' : ''}">${line.replace(/^[-•*]\s*/, '')}</div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    `;
-  }).join('');
-}
-
-function toggleCommit(storageKey, key, el) {
-  let checked = JSON.parse(localStorage.getItem(storageKey) || '{}');
-  checked[key] = !checked[key];
-  localStorage.setItem(storageKey, JSON.stringify(checked));
-  renderCommitments();
-}
-
-// ─── RENDER: BLOCKERS ─────────────────────────────────────────
-function renderBlockers() {
-  const currentWeek = getCurrentWeekNumber();
-  const activeBlockers = allReports.filter(r => r.blockers && r.blockers.trim() && r.week === currentWeek);
-  const container = document.getElementById('blockers-board');
-
-  if (!activeBlockers.length) {
-    container.innerHTML = '<div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);text-align:center;padding:16px 0;">No active blockers</div>';
-    return;
-  }
-
-  container.innerHTML = activeBlockers.map(r => `
-    <div style="background:rgba(255,204,0,0.05);border:1px solid rgba(255,204,0,0.2);border-radius:6px;padding:12px 14px;">
-      <div style="font-family:var(--font-mono);font-size:10px;color:var(--yellow);margin-bottom:6px;letter-spacing:1px;">${r.role.toUpperCase()}</div>
-      <div style="font-size:12px;color:var(--text);line-height:1.5;">${r.blockers}</div>
-    </div>
-  `).join('');
-}
-
-// ─── RENDER: LAUNCH CHECKLIST ─────────────────────────────────
-function renderLaunchChecklist() {
-  const signedPartners = allPartners.filter(p => p.stage === 'Signed' || p.stage === 'Active').length;
-  const hasReports = allReports.length >= 3;
-
-  const items = [
-    { label: '5 companies paid', done: signedPartners >= 5 },
-    { label: 'Before/after metrics documented', done: false },
-    { label: 'Onboarding repeatable (3+ runs)', done: false },
-    { label: 'Sales script proven to convert', done: false },
-    { label: 'Compliance logic proven manually', done: false },
-    { label: 'All 3 founders reporting weekly', done: hasReports },
-    { label: 'Design partner close documented', done: signedPartners >= 1 },
-    { label: 'Pricing finalized', done: false },
+// ═══════════════════════════════════════════
+// FOUNDER CARDS
+// ═══════════════════════════════════════════
+function renderFounders(){
+  const cw=getCW();
+  const filed=r=>allReports.some(rp=>rp.role===r&&rp.week===cw);
+  const founders=[
+    {n:'Filipe',r:'CRO · REVENUE',ms:[
+      {l:'Week Report',v:filed('Filipe')?'✓ Filed':'✗ Missing',c:filed('Filipe')?'green':'red'},
+      {l:'Streak',v:calcStreak('Filipe')+'wk',c:calcStreak('Filipe')>=3?'green':calcStreak('Filipe')>=1?'yellow':'red'},
+      {l:'Active Deals',v:allDeals.filter(d=>d.stage!=='Closed Won'&&d.stage!=='Closed Lost').length,c:''},
+      {l:'Closed Won',v:allDeals.filter(d=>d.stage==='Closed Won').length,c:'green'},
+    ]},
+    {n:'Loa',r:'CCO · MARKET',ms:[
+      {l:'Week Report',v:filed('Loa')?'✓ Filed':'✗ Missing',c:filed('Loa')?'green':'red'},
+      {l:'Streak',v:calcStreak('Loa')+'wk',c:calcStreak('Loa')>=3?'green':calcStreak('Loa')>=1?'yellow':'red'},
+      {l:'Partners Signed',v:allPartners.filter(p=>p.stage==='Signed'||p.stage==='Active').length,c:'green'},
+      {l:'Open Blockers',v:allBlockers.filter(b=>!b.resolved).length,c:allBlockers.filter(b=>!b.resolved).length===0?'green':'yellow'},
+    ]},
+    {n:'Clinton',r:'COO · OPS',ms:[
+      {l:'Week Report',v:filed('Clinton')?'✓ Filed':'✗ Missing',c:filed('Clinton')?'green':'red'},
+      {l:'Streak',v:calcStreak('Clinton')+'wk',c:calcStreak('Clinton')>=3?'green':calcStreak('Clinton')>=1?'yellow':'red'},
+      {l:'Blockers Resolved',v:allBlockers.filter(b=>b.resolved).length,c:'green'},
+      {l:'Open Blockers',v:allBlockers.filter(b=>!b.resolved).length,c:allBlockers.filter(b=>!b.resolved).length===0?'green':'red'},
+    ]}
   ];
+  document.getElementById('founder-grid').innerHTML=founders.map(f=>`
+    <div class="fcard"><div class="fcard-name">${f.n}</div><div class="fcard-role">${f.r}</div>
+    ${f.ms.map(m=>`<div class="mrow"><span class="ml">${m.l}</span><span class="mv ${m.c}">${m.v}</span></div>`).join('')}
+    </div>
+  `).join('');
+}
 
-  const container = document.getElementById('launch-checklist');
-  const doneCount = items.filter(i => i.done).length;
+// ═══════════════════════════════════════════
+// CHART
+// ═══════════════════════════════════════════
+function renderChart(){
+  const cw=getCW(); const st=Math.max(1,cw-5); const wks=[];
+  for(let w=st;w<=cw;w++) wks.push(w);
+  const byw={};
+  allReports.forEach(r=>{const w=r.week||1;if(!byw[w])byw[w]={Filipe:0,Loa:0,Clinton:0};if(byw[w][r.role]!==undefined)byw[w][r.role]++;});
+  const mx=Math.max(1,...wks.flatMap(w=>Object.values(byw[w]||{})));
+  const h=v=>Math.max(3,(v/mx)*85);
+  document.getElementById('chart-area').innerHTML=wks.map(w=>{const d=byw[w]||{Filipe:0,Loa:0,Clinton:0};return`<div class="bgrp"><div class="bar f" style="height:${h(d.Filipe)}px" data-v="F:${d.Filipe}"></div><div class="bar l" style="height:${h(d.Loa)}px" data-v="L:${d.Loa}"></div><div class="bar c" style="height:${h(d.Clinton)}px" data-v="C:${d.Clinton}"></div></div>`;}).join('');
+  document.getElementById('chart-weeks').innerHTML=wks.map(w=>`<div class="wlbl">W${w}</div>`).join('');
+}
 
-  container.innerHTML = `
-    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <div style="font-weight:700;">Engineer Hire Readiness</div>
-        <div style="font-family:var(--font-mono);font-size:13px;color:${doneCount >= 7 ? 'var(--green)' : 'var(--yellow)'};">${doneCount}/${items.length}</div>
+// ═══════════════════════════════════════════
+// ROADMAP
+// ═══════════════════════════════════════════
+function renderRmSel(){
+  const cw=getCW();
+  document.getElementById('rw-sel').innerHTML=Array.from({length:12},(_,i)=>i+1).map(w=>`
+    <button class="rw-btn ${w===rmWeek?'active':''}" onclick="setRmWeek(${w},this)">W${w}${w===cw?' ←':''}</button>
+  `).join('');
+}
+
+function setRmWeek(w,btn){
+  rmWeek=w;
+  document.querySelectorAll('.rw-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRm();
+}
+
+function renderRm(){
+  const d=RM[rmWeek]; const cw=getCW();
+  const phN={1:'Phase 1 — Foundation',2:'Phase 2 — Market Entry',3:'Phase 3 — Pre-Software Validation'};
+  const statusLabel=rmWeek<cw?'PAST':rmWeek===cw?'CURRENT WEEK':'UPCOMING';
+  const done=countRmDone(rmWeek); const total=d.f.length+d.l.length+d.c.length; const pct=Math.round((done/total)*100);
+  const colPct=pct>=80?'var(--green)':pct>=40?'var(--yellow)':'var(--red)';
+
+  const secHTML=(role,items,cls,label)=>{
+    const key=`revos_rm_w${rmWeek}_${role}`;
+    const chk=JSON.parse(localStorage.getItem(key)||'{}');
+    return `<div class="rm-role-sec"><div class="rm-role-hdr ${cls}">${label}</div>
+    ${items.map((it,i)=>`
+      <div class="rm-item ${chk[i]?'done':''}" onclick="toggleRm('${key}',${i},this)">
+        <div class="rm-chk">${chk[i]?'✓':''}</div>
+        <div class="rm-txt">${it}</div>
+        ${d.blocker&&!chk[i]?'<div class="blk-badge">BLOCKER</div>':''}
       </div>
-      <div style="background:var(--border);border-radius:4px;height:4px;margin-bottom:20px;">
-        <div style="background:var(--green);height:4px;border-radius:4px;width:${(doneCount / items.length) * 100}%;transition:width 0.5s;"></div>
+    `).join('')}</div>`;
+  };
+
+  document.getElementById('rm-content').innerHTML=`
+    <div class="rm-card">
+      <div class="rm-hdr">
+        <div><div class="rm-title">Week ${rmWeek}: ${d.title}</div><div class="rm-phase">${phN[d.phase]} · ${statusLabel}</div></div>
+        <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:${colPct}">${pct}%</div>
       </div>
-      ${items.map(item => `
-        <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
-          <span style="font-size:14px;${item.done ? 'color:var(--green)' : 'color:var(--muted)'}">${item.done ? '✓' : '○'}</span>
-          <span style="${item.done ? 'color:var(--text)' : 'color:var(--muted)'}">${item.label}</span>
-        </div>
-      `).join('')}
+      <div class="rm-obj">${d.obj}</div>
+      <div class="prog-wrap"><div class="prog-fill" style="width:${pct}%"></div></div>
+      ${secHTML('f',d.f,'f','FILIPE — CRO')}
+      ${secHTML('l',d.l,'l','LOA — CCO')}
+      ${secHTML('c',d.c,'c','CLINTON — COO')}
     </div>
   `;
 }
 
-// ─── TABS ─────────────────────────────────────────────────────
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  if (btn) btn.classList.add('active');
-  else document.querySelectorAll('.tab')[['dashboard','reports','submit','partners'].indexOf(name)].classList.add('active');
+function countRmDone(w){
+  let done=0;
+  ['f','l','c'].forEach(r=>{const k=`revos_rm_w${w}_${r}`;const ch=JSON.parse(localStorage.getItem(k)||'{}');done+=Object.values(ch).filter(Boolean).length;});
+  return done;
 }
 
-// ─── PARTNER MODAL ────────────────────────────────────────────
-function openPartnerModal() {
-  document.getElementById('partner-modal').classList.add('active');
-  selectedStage = '';
-  document.getElementById('p-name').value = '';
-  document.getElementById('p-contact').value = '';
-  document.getElementById('p-notes').value = '';
-  document.querySelectorAll('.stage-opt').forEach(b => b.classList.remove('active'));
+function toggleRm(key,i,el){
+  const ch=JSON.parse(localStorage.getItem(key)||'{}');
+  ch[i]=!ch[i];
+  localStorage.setItem(key,JSON.stringify(ch));
+  renderRm();
 }
 
-function closePartnerModal() {
-  document.getElementById('partner-modal').classList.remove('active');
+// ═══════════════════════════════════════════
+// PIPELINE
+// ═══════════════════════════════════════════
+const STAGES=['Outreach','First Call','Discovery','Offer Sent','Negotiating','Closed Won'];
+function renderPipe(){
+  document.getElementById('pipe-board').innerHTML=STAGES.map(st=>{
+    const deals=allDeals.filter(d=>d.stage===st);
+    return `<div class="pipe-col">
+      <div class="pipe-col-hdr"><span>${st}</span><span class="pipe-col-ct">${deals.length}</span></div>
+      ${deals.map(d=>{
+        const days=d.last_touched?Math.floor((new Date()-new Date(d.last_touched))/(864e5)):999;
+        const fc=days<=2?'fresh':days<=5?'warn':'stale';
+        const fl=days===0?'today':days===1?'yesterday':`${days}d ago`;
+        return `<div class="deal-card" onclick="openDealModal(${d.id},'${st}')">
+          <div class="deal-name">${d.name}</div>
+          ${d.contact?`<div class="deal-contact">${d.contact}</div>`:''}
+          <div class="deal-ftr"><span class="deal-days ${fc}">Touched: ${fl}</span><button class="btn-del" onclick="event.stopPropagation();delDeal(${d.id})">✕</button></div>
+          ${d.next_action?`<div class="deal-next">Next: ${d.next_action}</div>`:''}
+        </div>`;
+      }).join('')}
+      <button class="add-deal-btn" onclick="openDealModal(null,'${st}')">+ add deal</button>
+    </div>`;
+  }).join('');
 }
 
-function selectStage(el, stage) {
-  selectedStage = stage;
-  document.querySelectorAll('.stage-opt').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
+function openDealModal(id,stage){
+  document.getElementById('deal-modal').classList.add('active');
+  document.getElementById('d-edit-id').value=id||'';
+  document.getElementById('deal-modal-title').textContent=id?'Edit Deal':'Add Deal';
+  if(id){const d=allDeals.find(x=>x.id==id);if(d){document.getElementById('d-name').value=d.name||'';document.getElementById('d-contact').value=d.contact||'';document.getElementById('d-next').value=d.next_action||'';document.getElementById('d-notes').value=d.notes||'';selDStage=d.stage||'';}}
+  else{['d-name','d-contact','d-next','d-notes'].forEach(i=>document.getElementById(i).value='');selDStage=stage||'';}
+  document.querySelectorAll('#deal-stage-opts .sopt').forEach(b=>b.classList.toggle('active',b.textContent===selDStage));
 }
 
-// ─── TOAST ────────────────────────────────────────────────────
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
+function selDealStage(el,s){selDStage=s;document.querySelectorAll('#deal-stage-opts .sopt').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+
+async function saveDeal(){
+  const name=document.getElementById('d-name').value.trim();
+  if(!name){showToast('⚠ Name required');return;}
+  if(!selDStage){showToast('⚠ Select stage');return;}
+  const eid=document.getElementById('d-edit-id').value;
+  const pl={name,stage:selDStage,contact:document.getElementById('d-contact').value,next_action:document.getElementById('d-next').value,notes:document.getElementById('d-notes').value,last_touched:new Date().toISOString()};
+  try{if(eid)await db.from('deals').update(pl).eq('id',eid);else await db.from('deals').insert([pl]);showToast('✓ Deal saved');closeModal('deal-modal');await loadD();renderPipe();renderHealth();renderFounders();}catch(e){showToast('Error: '+e.message);}
 }
 
-// ─── REAL-TIME SUBSCRIPTION ───────────────────────────────────
-function subscribeRealtime() {
-  try {
-    db.channel('revos-reports')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'founder_reports' }, () => loadReports())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'design_partners' }, () => loadPartners())
-      .subscribe();
-  } catch(e) {
-    console.warn('Realtime subscription failed:', e.message);
-  }
+async function delDeal(id){try{await db.from('deals').delete().eq('id',id);await loadD();renderPipe();renderHealth();showToast('Removed');}catch(e){showToast('Error: '+e.message);}}
+
+// ═══════════════════════════════════════════
+// BLOCKERS LOG
+// ═══════════════════════════════════════════
+function renderBlog(){
+  const items=bFilter==='open'?allBlockers.filter(b=>!b.resolved):allBlockers;
+  document.getElementById('blockers-log').innerHTML=items.length?items.map(b=>`
+    <div class="blk-item">
+      <div class="blk-hdr">
+        <div class="blk-from ${b.filed_by}">${(b.filed_by||'').toUpperCase()} → ${b.assigned_to||'?'} by ${b.deadline||'?'}</div>
+        <div class="blk-date">${b.created_at?new Date(b.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'—'} · W${b.week||'?'}</div>
+      </div>
+      <div class="blk-txt">${b.description||''}</div>
+      <div class="blk-actions">
+        ${b.resolved?`<div class="blk-resolved">✓ Resolved${b.resolution?' — '+b.resolution:''}</div>`:`
+          <input class="blk-note" id="bres-${b.id}" placeholder="Resolution note...">
+          <button class="blk-res-btn" onclick="resolveBlk(${b.id})">MARK RESOLVED</button>
+        `}
+      </div>
+    </div>
+  `).join(''):`<div class="empty-st"><div class="empty-ico">✅</div>${bFilter==='open'?'No open blockers':'No blockers logged'}</div>`;
 }
 
-// ─── START ────────────────────────────────────────────────────
+function filterBlockers(f){
+  bFilter=f;
+  document.getElementById('bfilt-open').style.opacity=f==='open'?1:0.4;
+  document.getElementById('bfilt-all').style.opacity=f==='all'?1:0.4;
+  renderBlog();
+}
+
+async function resolveBlk(id){
+  const note=(document.getElementById('bres-'+id)||{}).value||'';
+  try{await db.from('blockers').update({resolved:true,resolution:note}).eq('id',id);showToast('✓ Blocker resolved');await loadB();renderBlog();renderSideBlk();renderAlerts();renderFounders();renderHealth();}catch(e){showToast('Error: '+e.message);}
+}
+
+// ═══════════════════════════════════════════
+// REPORTS
+// ═══════════════════════════════════════════
+function renderReports(){
+  const feed=document.getElementById('reports-feed');
+  if(!allReports.length){feed.innerHTML='<div class="empty-st"><div class="empty-ico">📋</div>No reports yet.</div>';return;}
+  feed.innerHTML=allReports.map(r=>{
+    const d=new Date(r.created_at);
+    const ds=d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' · W'+(r.week||'?');
+    return `<div class="rep-card">
+      <div class="rep-hdr"><div class="rep-role ${r.role}">${r.role} <span style="color:var(--muted);font-size:10px;font-weight:400">(${r.role==='Filipe'?'CRO':r.role==='Loa'?'CCO':'COO'})</span></div><div class="rep-time">${ds}</div></div>
+      ${r.outputs?`<div class="rfl">Outputs</div><div class="rfv">${r.outputs}</div>`:''}
+      ${r.learnings?`<div class="rfl">Learnings</div><div class="rfv">${r.learnings}</div>`:''}
+      ${r.blockers?`<div class="rfl">Blockers</div><div class="rfv" style="color:var(--yellow)">${r.blockers}</div>`:''}
+      ${r.metrics?`<div class="rfl">Metrics</div><div class="rfv">${r.metrics}</div>`:''}
+      ${r.commitments?`<div class="rfl">Next Week</div><div class="rfv" style="color:var(--green)">${r.commitments}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// SUBMIT REPORT
+// ═══════════════════════════════════════════
+async function submitReport(){
+  const role=document.getElementById('f-role').value;
+  const outputs=document.getElementById('f-out').value.trim();
+  const blockersText=document.getElementById('f-blk').value.trim();
+  if(!outputs){showToast('⚠ Outputs required');return;}
+  const week=getCW();
+  try{
+    await db.from('founder_reports').insert([{role,outputs,learnings:document.getElementById('f-learn').value.trim(),blockers:blockersText,metrics:document.getElementById('f-met').value.trim(),commitments:document.getElementById('f-com').value.trim(),week}]);
+    if(blockersText.trim()){
+      const pts=blockersText.split('→').map(s=>s.trim());
+      await db.from('blockers').insert([{filed_by:role,description:blockersText,assigned_to:pts[1]||'',deadline:pts[2]||'',week,resolved:false}]);
+    }
+    showToast('✓ Report submitted');
+    ['f-out','f-learn','f-blk','f-met','f-com'].forEach(i=>document.getElementById(i).value='');
+    await Promise.all([loadR(),loadB()]);
+    renderAll();
+    switchTab('reports',document.querySelectorAll('.tab')[4]);
+  }catch(e){showToast('Error: '+e.message);}
+}
+
+// ═══════════════════════════════════════════
+// PARTNERS
+// ═══════════════════════════════════════════
+function renderPartners(){
+  const signed=allPartners.filter(p=>p.stage==='Signed'||p.stage==='Active');
+  const sc={'Outreach':'var(--muted)','Discovery Call':'var(--blue)','Offer Sent':'var(--yellow)','Signed':'var(--green)','Active':'var(--green)'};
+  document.getElementById('pslots').innerHTML=Array.from({length:5},(_,i)=>{const p=signed[i];return p?`<div class="pslot filled">✓ ${p.name.split(' ')[0]}</div>`:`<div class="pslot">${i+1}</div>`;}).join('');
+  document.getElementById('plist').innerHTML=allPartners.length?allPartners.map(p=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;margin-bottom:7px;font-size:12px;">
+      <div style="width:7px;height:7px;border-radius:50%;background:${sc[p.stage]||'var(--muted)'};flex-shrink:0;"></div>
+      <div style="flex:1;font-weight:600;">${p.name}</div>
+      ${p.contact?`<div style="color:var(--muted);font-size:11px;">${p.contact}</div>`:''}
+      <div style="font-family:var(--font-mono);font-size:8px;color:${sc[p.stage]||'var(--muted)'}">${p.stage}</div>
+      <button class="btn-del" onclick="delPartner(${p.id})">✕</button>
+    </div>
+  `).join(''):'<div class="empty-st"><div class="empty-ico">🎯</div>No design partners yet.</div>';
+}
+
+function renderLaunch(){
+  const signed=allPartners.filter(p=>p.stage==='Signed'||p.stage==='Active').length;
+  const items=[
+    {l:'5 companies paid/active',done:signed>=5},
+    {l:'Before/after metrics documented',done:false},
+    {l:'Onboarding repeatable (3+ runs)',done:false},
+    {l:'Sales script converts consistently',done:false},
+    {l:'Compliance logic proven manually',done:false},
+    {l:'All 3 founders filing weekly (4wk streak)',done:calcStreak('Filipe')>=4&&calcStreak('Loa')>=4&&calcStreak('Clinton')>=4},
+    {l:'First design partner closed',done:signed>=1},
+    {l:'Final pricing locked',done:false},
+  ];
+  const done=items.filter(i=>i.done).length;
+  document.getElementById('launch-chk').innerHTML=`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><div style="font-weight:700;">Engineer Hire Readiness</div><div style="font-family:var(--font-mono);color:${done>=6?'var(--green)':'var(--yellow)'};">${done}/${items.length}</div></div>
+      <div class="prog-wrap"><div class="prog-fill" style="width:${(done/items.length)*100}%"></div></div>
+      ${items.map(it=>`<div class="chk-item"><span class="chk-icon" style="color:${it.done?'var(--green)':'var(--muted)'}">${it.done?'✓':'○'}</span><span class="chk-text ${it.done?'done':''}">${it.l}</span></div>`).join('')}
+    </div>
+  `;
+}
+
+function openPartnerModal(){document.getElementById('partner-modal').classList.add('active');selPStage='';['p-name','p-contact','p-notes'].forEach(i=>document.getElementById(i).value='');document.querySelectorAll('#partner-stage-opts .sopt').forEach(b=>b.classList.remove('active'));}
+function selStage(el,s){selPStage=s;document.querySelectorAll('#partner-stage-opts .sopt').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+
+async function savePartner(){
+  const name=document.getElementById('p-name').value.trim();
+  if(!name){showToast('⚠ Name required');return;}
+  if(!selPStage){showToast('⚠ Select stage');return;}
+  try{await db.from('design_partners').insert([{name,contact:document.getElementById('p-contact').value,stage:selPStage,notes:document.getElementById('p-notes').value}]);showToast('✓ Partner added');closeModal('partner-modal');await loadP();renderPartners();renderHealth();renderLaunch();}catch(e){showToast('Error: '+e.message);}
+}
+
+async function delPartner(id){try{await db.from('design_partners').delete().eq('id',id);await loadP();renderPartners();renderHealth();showToast('Removed');}catch(e){showToast('Error: '+e.message);}}
+
+// ═══════════════════════════════════════════
+// ALERTS
+// ═══════════════════════════════════════════
+function renderAlerts(){
+  const alerts=[];const cw=getCW();const tw=allReports.filter(r=>r.week===cw);
+  ['Filipe','Loa','Clinton'].forEach(role=>{
+    if(!tw.find(r=>r.role===role))alerts.push({i:'⚠️',t:`${role} hasn't filed Week ${cw} report`,s:'red'});
+    const st=calcStreak(role);
+    if(st===0&&cw>1)alerts.push({i:'🔴',t:`${role} streak broken`,s:'red'});
+    else if(st===1&&cw>2)alerts.push({i:'🟡',t:`${role} streak at risk (1 week)`,s:'yellow'});
+  });
+  const signed=allPartners.filter(p=>p.stage==='Signed'||p.stage==='Active').length;
+  if(cw>=4&&signed===0)alerts.push({i:'🚨',t:'No signed partners — Week 4+ requires first close',s:'red'});
+  const stale=allDeals.filter(d=>{if(d.stage==='Closed Won'||d.stage==='Closed Lost')return false;const days=d.last_touched?Math.floor((new Date()-new Date(d.last_touched))/864e5):999;return days>5;});
+  if(stale.length)alerts.push({i:'📞',t:`${stale.length} deal(s) stale 5+ days: ${stale.map(d=>d.name).join(', ')}`,s:'red'});
+  const ob=allBlockers.filter(b=>!b.resolved).length;
+  if(ob>=3)alerts.push({i:'🧱',t:`${ob} unresolved blockers — team blocked`,s:'red'});
+  const c=document.getElementById('alerts-list');
+  c.innerHTML=alerts.length?alerts.map(a=>`
+    <div class="alert-item"><div class="alert-icon">${a.i}</div>
+    <div><div class="alert-txt">${a.t}</div><div class="alert-meta" style="color:${a.s==='red'?'var(--red)':'var(--yellow)'}">${a.s==='red'?'ACTION REQUIRED':'WATCH'}</div></div></div>
+  `).join(''):'<div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-align:center;padding:12px 0;">✅ No alerts</div>';
+}
+
+// ═══════════════════════════════════════════
+// COMMITMENTS
+// ═══════════════════════════════════════════
+function updateWkNav(){document.getElementById('wknav-lbl').textContent='WEEK '+Math.max(1,getCW()+weekOffset);}
+function shiftWeek(d){weekOffset+=d;updateWkNav();renderCommits();}
+
+function renderCommits(){
+  const w=getCW()+weekOffset;
+  const wrs=allReports.filter(r=>r.week===w&&r.commitments);
+  const key=`revos_cm_w${w}`;let chk={};try{chk=JSON.parse(localStorage.getItem(key)||'{}');}catch(e){}
+  const panel=document.getElementById('commits-panel');
+  if(!wrs.length){panel.innerHTML=`<div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-align:center;padding:12px 0;">No commitments for week ${w}</div>`;return;}
+  panel.innerHTML=wrs.map(r=>{
+    const lines=r.commitments.split('\n').filter(l=>l.trim());
+    return `<div class="cm-block"><div class="cm-role">${r.role.toUpperCase()}</div>
+    ${lines.map((ln,i)=>{const k=`${r.id}_${i}`;const done=chk[k];return`<div class="cm-item" onclick="toggleCm('${key}','${k}',this)"><input type="checkbox" ${done?'checked':''} onclick="event.stopPropagation();toggleCm('${key}','${k}',this.parentElement)"><div class="cm-txt ${done?'done':''}">${ln.replace(/^[-•*]\s*/,'')}</div></div>`;}).join('')}
+    </div>`;
+  }).join('');
+}
+
+function toggleCm(key,k,el){let c={};try{c=JSON.parse(localStorage.getItem(key)||'{}');}catch(e){}c[k]=!c[k];localStorage.setItem(key,JSON.stringify(c));renderCommits();}
+
+// ═══════════════════════════════════════════
+// SIDEBAR BLOCKERS
+// ═══════════════════════════════════════════
+function renderSideBlk(){
+  const open=allBlockers.filter(b=>!b.resolved);
+  document.getElementById('sidebar-blk').innerHTML=open.length?open.map(b=>`
+    <div style="background:rgba(255,204,0,.05);border:1px solid rgba(255,204,0,.18);border-radius:5px;padding:9px 11px;margin-bottom:7px;">
+      <div style="font-family:var(--font-mono);font-size:8px;color:var(--yellow);margin-bottom:3px;">${(b.filed_by||'').toUpperCase()} → ${b.assigned_to||'?'}</div>
+      <div style="font-size:11px;line-height:1.4;">${b.description}</div>
+      ${b.deadline?`<div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-top:3px;">Due: ${b.deadline}</div>`:''}
+    </div>
+  `).join(''):'<div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-align:center;padding:12px 0;">No open blockers</div>';
+}
+
+// ═══════════════════════════════════════════
+// MONDAY MEETING
+// ═══════════════════════════════════════════
+const MPHASES=[
+  {name:'Metrics Review',mins:10,desc:'Read the numbers. No discussion.',rules:['Each founder states 3 key numbers only','No context unless asked','Red metric = noted, not debated']},
+  {name:'Commitments Check',mins:10,desc:'Last week\'s commitments: done or not done. Binary.',rules:['No partial credit','Miss twice = change the commitment','No excuses — just the result']},
+  {name:'Blockers',mins:15,desc:'Every blocker must leave with an owner and a deadline.',rules:['Problem → Owner → Deadline format only','No problem without assigning a solver','Can\'t assign it? It\'s a task, not a blocker']},
+  {name:'Next Week Commitments',mins:10,desc:'Each founder: 3 deliverables. Not tasks.',rules:['Bad: "Work on website"','Good: "Homepage live with pipeline diagram"','Write it in the dashboard before meeting ends']}
+];
+
+let mPhase=0,mTimer=null,mSecs=0,mRunning=false;
+
+function initMeeting(){renderMeeting();}
+
+function renderMeeting(){
+  document.getElementById('meet-prog').innerHTML=MPHASES.map((_,i)=>`<div class="meet-seg ${i<mPhase?'done':i===mPhase?'active':''}" id="mseg-${i}"></div>`).join('');
+  document.getElementById('meet-phases').innerHTML=MPHASES.map((p,i)=>{
+    const cur=i===mPhase,done=i<mPhase;
+    const s=cur?mSecs:p.mins*60;
+    const mm=String(Math.floor(s/60)).padStart(2,'0'),ss=String(s%60).padStart(2,'0');
+    return `<div class="meet-phase ${cur?'active':''} ${done?'done':''}" onclick="jumpPhase(${i})">
+      <div class="mp-hdr"><div class="mp-name">${done?'✓ ':''} ${i+1}. ${p.name}</div><div class="mp-alloc">${p.mins} min</div></div>
+      ${cur?`<div class="mp-cd" id="meet-cd">${mm}:${ss}</div>`:''}
+      <div class="mp-desc">${p.desc}</div>
+      <div>${p.rules.map(r=>`<div class="mp-rule">${r}</div>`).join('')}</div>
+    </div>`;
+  }).join('');
+  const btn=document.getElementById('meet-start-btn');
+  if(btn) btn.textContent=mRunning?'PAUSE':mPhase>=MPHASES.length?'COMPLETE ✓':'START TIMER';
+}
+
+function openMeeting(){document.getElementById('meet-modal').classList.add('active');if(mSecs===0)mSecs=MPHASES[0].mins*60;renderMeeting();}
+
+function meetingAction(){
+  if(mPhase>=MPHASES.length){resetMeeting();return;}
+  mRunning=!mRunning;
+  if(mRunning){mTimer=setInterval(()=>{mSecs--;updateCd();if(mSecs<=0)skipPhase();},1000);}
+  else clearInterval(mTimer);
+  renderMeeting();
+}
+
+function updateCd(){
+  const el=document.getElementById('meet-cd');if(!el)return;
+  const mm=String(Math.floor(mSecs/60)).padStart(2,'0'),ss=String(mSecs%60).padStart(2,'0');
+  el.textContent=`${mm}:${ss}`;
+  el.style.color=mSecs<=60?'var(--red)':mSecs<=180?'var(--yellow)':'var(--purple)';
+}
+
+function skipPhase(){clearInterval(mTimer);mRunning=false;mPhase++;if(mPhase<MPHASES.length)mSecs=MPHASES[mPhase].mins*60;renderMeeting();}
+function jumpPhase(i){clearInterval(mTimer);mRunning=false;mPhase=i;mSecs=MPHASES[i].mins*60;renderMeeting();}
+function resetMeeting(){clearInterval(mTimer);mRunning=false;mPhase=0;mSecs=MPHASES[0].mins*60;renderMeeting();}
+
+// ═══════════════════════════════════════════
+// TABS / UTILS
+// ═══════════════════════════════════════════
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('active');}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ═══════════════════════════════════════════
+// REALTIME
+// ═══════════════════════════════════════════
+function subscribe(){
+  try{db.channel('revos-all')
+    .on('postgres_changes',{event:'*',schema:'public',table:'founder_reports'},async()=>{await loadR();renderAll();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'design_partners'},async()=>{await loadP();renderPartners();renderHealth();renderLaunch();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'deals'},async()=>{await loadD();renderPipe();renderHealth();renderAlerts();renderFounders();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'blockers'},async()=>{await loadB();renderBlog();renderSideBlk();renderAlerts();renderFounders();renderHealth();})
+    .subscribe();
+  }catch(e){console.warn('RT:',e.message);}
+}
+
+// ═══════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════
 init();
-subscribeRealtime();
 </script>
 </body>
 </html>
