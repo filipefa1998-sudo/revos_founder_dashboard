@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>REVOS Founder Scorecard</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;background:#0f172a;color:#e5e7eb;padding:20px}
+h1{color:#22c55e}
+.card{background:#111827;padding:16px;margin-bottom:16px;border-radius:10px}
+input,textarea,select{width:100%;margin-top:6px;margin-bottom:12px;padding:8px;border-radius:6px;border:none}
+button{background:#22c55e;color:#000;padding:10px 16px;border:none;border-radius:8px;cursor:pointer}
+.table{margin-top:20px}
+.row{border-bottom:1px solid #374151;padding:6px 0}
+</style>
+</head>
+<body>
+<h1>REVOS Weekly Founder Report</h1>
+
+<div class="card">
+<h3>Submit Report</h3>
+<select id="role">
+<option value="Filipe">Filipe (CRO)</option>
+<option value="Loa">Loa (CCO)</option>
+<option value="Clinton">Clinton (COO)</option>
+</select>
+
+<textarea id="outputs" placeholder="Outputs shipped"></textarea>
+<textarea id="learnings" placeholder="Learnings"></textarea>
+<textarea id="blockers" placeholder="Blockers"></textarea>
+<input id="metrics" placeholder="Key metrics" />
+<button onclick="submitReport()">Submit</button>
+</div>
+
+<div class="card table">
+<h3>Live Reports</h3>
+<div id="reports"></div>
+</div>
+
+<script>
+const supabaseUrl = "https://zmfmvaedfrdwldhtfjmm.supabase.co";
+const supabaseKey = "sb_publishable_Wgamoaf3a1dlzdH9UFc9Pg_ziGt7Cwh";
+const db = supabase.createClient(supabaseUrl, supabaseKey);
+
+async function submitReport(){
+  const role=document.getElementById('role').value;
+  const outputs=document.getElementById('outputs').value;
+  const learnings=document.getElementById('learnings').value;
+  const blockers=document.getElementById('blockers').value;
+  const metrics=document.getElementById('metrics').value;
+
+  await db.from('founder_reports').insert([{role,outputs,learnings,blockers,metrics}]);
+  loadReports();
+}
+
+async function loadReports(){
+  const {data}=await db.from('founder_reports').select('*').order('created_at',{ascending:false});
+  const container=document.getElementById('reports');
+  container.innerHTML='';
+  data.forEach(r=>{
+    container.innerHTML+=`<div class='row'><strong>${r.role}</strong><br>Outputs: ${r.outputs}<br>Learnings: ${r.learnings}<br>Blockers: ${r.blockers}<br>Metrics: ${r.metrics}</div>`;
+  });
+}
+loadReports();
+</script>
+</body>
+</html>
